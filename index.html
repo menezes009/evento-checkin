@@ -40,7 +40,7 @@ lista.forEach(p=>{
 
 html+=`
 <div class="result">
-<img src="${p.foto}">
+<<img src="${p.foto}" width="140" onerror="this.style.display='none'">
 <h3>${p.nome}</h3>
 <button onclick="checkin('${p.nome}')">Liberar entrada</button>
 </div>
