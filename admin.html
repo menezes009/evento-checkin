@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<title>Painel do Evento</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#111;
+color:white;
+text-align:center;
+}
+
+#contador{
+font-size:40px;
+margin-top:40px;
+}
+
+button{
+margin-top:30px;
+padding:10px 20px;
+font-size:18px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Painel do Evento</h1>
+
+<div id="contador">Carregando...</div>
+
+<button onclick="reset()">Reiniciar evento</button>
+
+<script>
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
+
+async function carregar(){
+
+let res = await fetch(SCRIPT_URL)
+
+let dados = await res.json()
+
+let total = 0
+
+dados.forEach(p=>{
+total += p.entradas
+})
+
+document.getElementById("contador").innerText =
+"Pessoas no evento: " + total
+
+}
+
+carregar()
+
+</script>
+
+</body>
+
+</html>
