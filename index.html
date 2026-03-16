@@ -19,6 +19,12 @@ h1{
 margin-top:40px;
 }
 
+#contador{
+margin-top:10px;
+font-size:20px;
+color:#00e676;
+}
+
 #search{
 font-size:22px;
 padding:12px;
@@ -48,6 +54,15 @@ color:white;
 border-radius:8px;
 }
 
+button:disabled{
+background:#555;
+}
+
+video{
+margin-top:30px;
+border-radius:12px;
+}
+
 </style>
 
 </head>
@@ -56,37 +71,44 @@ border-radius:8px;
 
 <h1>Portaria</h1>
 
+<div id="contador">Pessoas no evento: 0</div>
+
 <input id="search" placeholder="Digite o nome">
+
+<br>
+
+<video id="camera" width="300" height="220" autoplay muted></video>
 
 <div id="results"></div>
 
 <script>
 
-let convidados = [];
+let convidados = []
+let total = 0
 
-async function carregarConvidados(){
+async function carregar(){
 
-let res = await fetch("https://script.google.com/macros/s/AKfycbxTDXjL5QeonoS46RrAbD8H0aPAyF1xU7Ub4Yf3aDfA7Co0QUPrbJKMQR9idzt-nIRIHA/exec");
+let res = await fetch("https://script.google.com/macros/s/AKfycbxTDXjL5QeonoS46RrAbD8H0aPAyF1xU7Ub4Yf3aDfA7Co0QUPrbJKMQR9idzt-nIRIHA/exec")
 
-convidados = await res.json();
+convidados = await res.json()
 
-console.log(convidados);
+console.log(convidados)
 
 }
 
-carregarConvidados();
+carregar()
 
-document.getElementById("search").addEventListener("input", function(){
+document.getElementById("search").addEventListener("input",function(){
 
-let termo = this.value.toLowerCase();
+let termo = this.value.toLowerCase()
 
-let resultados = convidados.filter(p =>
-p.nome && p.nome.toLowerCase().includes(termo)
-);
+let lista = convidados.filter(p =>
+p.nome.toLowerCase().includes(termo)
+)
 
-let html = "";
+let html = ""
 
-resultados.forEach(p => {
+lista.forEach(p=>{
 
 html += `
 <div class="result">
@@ -100,24 +122,45 @@ Liberar entrada
 </button>
 
 </div>
-`;
+`
 
-});
+})
 
-document.getElementById("results").innerHTML = html;
+document.getElementById("results").innerHTML = html
 
-});
+})
 
 function checkin(nome){
 
 fetch("https://script.google.com/macros/s/AKfycbxTDXjL5QeonoS46RrAbD8H0aPAyF1xU7Ub4Yf3aDfA7Co0QUPrbJKMQR9idzt-nIRIHA/exec",{
 method:"POST",
 body:JSON.stringify({nome:nome})
-});
+})
 
-alert("Entrada registrada para " + nome);
+total++
+
+document.getElementById("contador").innerText =
+"Pessoas no evento: " + total
+
+alert("Entrada registrada para " + nome)
 
 }
+
+// CAMERA (para reconhecimento facial)
+
+async function iniciarCamera(){
+
+let video = document.getElementById("camera")
+
+let stream = await navigator.mediaDevices.getUserMedia({
+video:true
+})
+
+video.srcObject = stream
+
+}
+
+iniciarCamera()
 
 </script>
 
