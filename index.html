@@ -63,19 +63,34 @@ border-radius:8px;
 
 let convidados = [];
 
-fetch("https://script.google.com/macros/s/AKfycbxTDXjL5QeonoS46RrAbD8H0aPAyF1xU7Ub4Yf3aDfA7Co0QUPrbJKMQR9idzt-nIRIHA/exec")
-.then(response => response.json())
-.then(data => {
+async function carregar() {
+
+try {
+
+let res = await fetch("https://script.google.com/macros/s/AKfycbxTDXjL5QeonoS46RrAbD8H0aPAyF1xU7Ub4Yf3aDfA7Co0QUPrbJKMQR9idzt-nIRIHA/exec");
+
+let data = await res.json();
+
 convidados = data;
-})
-.catch(err => console.log(err));
+
+console.log("convidados carregados", convidados);
+
+} catch(e){
+
+console.error("erro carregando api", e);
+
+}
+
+}
+
+carregar();
 
 document.getElementById("search").addEventListener("input", function(){
 
 let termo = this.value.toLowerCase();
 
-let lista = convidados.filter(p =>
-p.nome.toLowerCase().includes(termo)
+let lista = convidados.filter(p => 
+(p.nome || "").toLowerCase().includes(termo)
 );
 
 let html = "";
@@ -85,7 +100,7 @@ lista.forEach(p => {
 html += `
 <div class="result">
 
-<img src="${p.foto}">
+<img src="${p.foto}" style="width:220px;border-radius:12px">
 
 <h2>${p.nome}</h2>
 
@@ -109,6 +124,3 @@ alert("Entrada liberada para " + nome);
 }
 
 </script>
-
-</body>
-</html>
