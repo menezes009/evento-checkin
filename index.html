@@ -16,7 +16,7 @@ text-align:center;
 }
 
 h1{
-margin-top:20px;
+margin-top:30px;
 }
 
 #search{
@@ -35,7 +35,6 @@ margin-top:30px;
 img{
 width:220px;
 border-radius:14px;
-margin-top:10px;
 }
 
 button{
@@ -73,7 +72,7 @@ border-radius:12px;
 
 let convidados=[]
 
-fetch("https://script.google.com/macros/s/AKfycbwDJQ43LBrq35AJv09D9l6eSewvtPr5CFeW1IynURVbkosGWV_wdtT4R95Z-5TXdgcj2Q/exec")
+fetch("COLE_AQUI_SEU_LINK_DO_SCRIPT")
 .then(res=>res.json())
 .then(data=>{
 convidados=data
@@ -92,7 +91,7 @@ lista.forEach(p=>{
 html+=`
 <div class="result">
 
-<img src="${p.foto}" style="width:220px;border-radius:12px;" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.src='https://i.imgur.com/6VBx3io.png'">
+<img src="${p.foto}">
 
 <h2>${p.nome}</h2>
 
@@ -111,12 +110,7 @@ document.getElementById("results").innerHTML=html
 
 function checkin(nome){
 
-fetch("SEU_SCRIPT_CHECKIN",{
-method:"POST",
-body:JSON.stringify({nome:nome})
-})
-
-alert("Entrada registrada para "+nome)
+alert("Entrada liberada para "+nome)
 
 }
 
