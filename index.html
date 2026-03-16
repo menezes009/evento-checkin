@@ -111,7 +111,12 @@ document.getElementById("results").innerHTML=html
 
 function checkin(nome){
 
-alert("Entrada liberada para "+nome)
+fetch("SEU_SCRIPT_CHECKIN",{
+method:"POST",
+body:JSON.stringify({nome:nome})
+})
+
+alert("Entrada registrada para "+nome)
 
 }
 
