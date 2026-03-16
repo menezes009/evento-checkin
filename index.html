@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Portaria Evento</title>
+<style>
+body{font-family:Arial;text-align:center}
+input{font-size:20px;padding:10px;width:300px}
+.result{margin-top:20px}
+img{width:120px;border-radius:10px}
+button{padding:10px 20px;font-size:18px}
+</style>
+</head>
+
+<body>
+
+<h1>Buscar convidado</h1>
+
+<input id="search" placeholder="Digite o nome">
+
+<div id="results"></div>
+
+<script>
+
+let convidados=[]
+
+fetch("convidados.json")
+.then(r=>r.json())
+.then(data=>convidados=data)
+
+document.getElementById("search").addEventListener("input",function(){
+
+let termo=this.value.toLowerCase()
+
+let lista=convidados.filter(p=>p.nome.toLowerCase().includes(termo))
+
+let html=""
+
+lista.forEach(p=>{
+
+html+=`
+<div class="result">
+<img src="${p.foto}">
+<h3>${p.nome}</h3>
+<button onclick="checkin('${p.nome}')">Liberar entrada</button>
+</div>
+`
+
+})
+
+document.getElementById("results").innerHTML=html
+
+})
+
+function checkin(nome){
+alert("Entrada liberada para "+nome)
+}
+
+</script>
+
+</body>
+</html>
