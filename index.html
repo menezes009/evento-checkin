@@ -1,20 +1,54 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+
 <meta charset="UTF-8">
+
 <title>Portaria Evento</title>
+
 <style>
-body{font-family:Arial;text-align:center}
-input{font-size:20px;padding:10px;width:300px}
-.result{margin-top:20px}
-img{width:120px;border-radius:10px}
-button{padding:10px 20px;font-size:18px}
+
+body{
+font-family:Arial;
+background:#111;
+color:white;
+text-align:center;
+}
+
+input{
+font-size:22px;
+padding:10px;
+width:300px;
+margin-top:20px;
+}
+
+.result{
+margin-top:30px;
+}
+
+img{
+width:200px;
+border-radius:12px;
+}
+
+button{
+margin-top:10px;
+padding:12px 20px;
+font-size:18px;
+background:#00c853;
+border:none;
+color:white;
+border-radius:8px;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<h1>Buscar convidado</h1>
+<h1>Portaria</h1>
 
 <input id="search" placeholder="Digite o nome">
 
@@ -24,7 +58,7 @@ button{padding:10px 20px;font-size:18px}
 
 let convidados=[]
 
-fetch("https://script.google.com/macros/s/AKfycbwP2vFtxh4q4kSjslAhxP4OWUKWQB46iOnubfaDyasKJWrH8fuybtTSRVtAPhYzAnbw-w/exec")
+fetch("https://script.google.com/macros/s/AKfycbwDJQ43LBrq35AJv09D9l6eSewvtPr5CFeW1IynURVbkosGWV_wdtT4R95Z-5TXdgcj2Q/exec")
 .then(r=>r.json())
 .then(data=>convidados=data)
 
@@ -40,8 +74,8 @@ lista.forEach(p=>{
 
 html+=`
 <div class="result">
-<<img src="${p.foto}" width="140" onerror="this.style.display='none'">
-<h3>${p.nome}</h3>
+<img src="${p.foto}">
+<h2>${p.nome}</h2>
 <button onclick="checkin('${p.nome}')">Liberar entrada</button>
 </div>
 `
@@ -53,7 +87,9 @@ document.getElementById("results").innerHTML=html
 })
 
 function checkin(nome){
+
 alert("Entrada liberada para "+nome)
+
 }
 
 </script>
