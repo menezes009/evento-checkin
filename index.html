@@ -17,10 +17,14 @@ color:white;
 text-align:center;
 }
 
+h1{
+margin-top:30px;
+}
+
 #reader{
 width:320px;
 margin:auto;
-margin-top:40px;
+margin-top:30px;
 }
 
 #status{
@@ -32,8 +36,9 @@ height:100%;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:60px;
+font-size:50px;
 font-weight:bold;
+z-index:999;
 }
 
 .green{
@@ -62,17 +67,17 @@ display:none;
 
 <script>
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
+const SCRIPT_URL="const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec""
 
-function mostrarTela(cor,texto){
+function mostrar(cor,texto){
 
-let status = document.getElementById("status")
+let tela=document.getElementById("status")
 
-status.className = cor
-status.innerText = texto
+tela.className=cor
+tela.innerText=texto
 
 setTimeout(()=>{
-status.className="hidden"
+tela.className="hidden"
 },2000)
 
 }
@@ -83,25 +88,24 @@ fetch(SCRIPT_URL,{
 method:"POST",
 body:JSON.stringify({codigo:decodedText})
 })
-
 .then(res=>res.text())
 .then(res=>{
 
 if(res=="OK"){
 
-mostrarTela("green","ENTRADA LIBERADA")
+mostrar("green","ENTRADA LIBERADA")
 
 }
 
 else if(res=="LIMITE"){
 
-mostrarTela("red","ACOMPANHANTE ESGOTADO")
+mostrar("red","ACOMPANHANTE ESGOTADO")
 
 }
 
 else{
 
-mostrarTela("red","QR INVÁLIDO")
+mostrar("red","QR INVÁLIDO")
 
 }
 
@@ -109,9 +113,22 @@ mostrarTela("red","QR INVÁLIDO")
 
 }
 
-let scanner = new Html5QrcodeScanner("reader",{fps:10,qrbbox:250})
+function iniciarScanner(){
 
-scanner.render(onScanSuccess)
+const html5QrCode = new Html5Qrcode("reader");
+
+html5QrCode.start(
+{ facingMode: "environment" },
+{
+fps:10,
+qrbox:250
+},
+onScanSuccess
+);
+
+}
+
+iniciarScanner()
 
 </script>
 
