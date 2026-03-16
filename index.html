@@ -1,3 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<title>Portaria Evento</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#111;
+color:white;
+text-align:center;
+}
+
+h1{
+margin-top:40px;
+}
+
+#search{
+font-size:22px;
+padding:12px;
+width:300px;
+margin-top:20px;
+border-radius:8px;
+border:none;
+}
+
+.result{
+margin-top:30px;
+}
+
+img{
+width:220px;
+border-radius:14px;
+margin-top:10px;
+}
+
+button{
+margin-top:10px;
+padding:14px 24px;
+font-size:18px;
+background:#00c853;
+border:none;
+color:white;
+border-radius:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Portaria</h1>
+
+<input id="search" placeholder="Digite o nome">
+
+<div id="results"></div>
+
 <script>
 
 let convidados = [];
@@ -29,7 +91,7 @@ resultados.forEach(p => {
 html += `
 <div class="result">
 
-<img src="${p.foto}" style="width:220px;border-radius:12px;">
+<img src="${p.foto}">
 
 <h2>${p.nome}</h2>
 
@@ -58,3 +120,6 @@ alert("Entrada registrada para " + nome);
 }
 
 </script>
+
+</body>
+</html>
