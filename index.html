@@ -24,18 +24,28 @@ margin-top:40px;
 }
 
 #status{
-font-size:40px;
-margin-top:20px;
-padding:20px;
-border-radius:10px;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:60px;
+font-weight:bold;
 }
 
 .green{
-background:green;
+background:#00c853;
 }
 
 .red{
-background:red;
+background:#d50000;
+}
+
+.hidden{
+display:none;
 }
 
 </style>
@@ -44,15 +54,28 @@ background:red;
 
 <body>
 
-<h1>Scanner da Portaria</h1>
-
-<div id="status">Aguardando QR...</div>
+<h1>Scanner do Evento</h1>
 
 <div id="reader"></div>
+
+<div id="status" class="hidden"></div>
 
 <script>
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
+
+function mostrarTela(cor,texto){
+
+let status = document.getElementById("status")
+
+status.className = cor
+status.innerText = texto
+
+setTimeout(()=>{
+status.className="hidden"
+},2000)
+
+}
 
 function onScanSuccess(decodedText){
 
@@ -64,26 +87,21 @@ body:JSON.stringify({codigo:decodedText})
 .then(res=>res.text())
 .then(res=>{
 
-let status = document.getElementById("status")
-
 if(res=="OK"){
 
-status.className="green"
-status.innerText="ENTRADA LIBERADA"
+mostrarTela("green","ENTRADA LIBERADA")
 
 }
 
 else if(res=="LIMITE"){
 
-status.className="red"
-status.innerText="LIMITE ATINGIDO"
+mostrarTela("red","ACOMPANHANTE ESGOTADO")
 
 }
 
 else{
 
-status.className="red"
-status.innerText="QR INVÁLIDO"
+mostrarTela("red","QR INVÁLIDO")
 
 }
 
@@ -98,4 +116,5 @@ scanner.render(onScanSuccess)
 </script>
 
 </body>
+
 </html>
