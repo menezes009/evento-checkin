@@ -4,7 +4,6 @@
 <head>
 
 <meta charset="UTF-8">
-
 <title>Portaria Evento</title>
 
 <style>
@@ -16,11 +15,17 @@ color:white;
 text-align:center;
 }
 
-input{
+h1{
+margin-top:20px;
+}
+
+#search{
 font-size:22px;
-padding:10px;
+padding:12px;
 width:300px;
 margin-top:20px;
+border-radius:8px;
+border:none;
 }
 
 .result{
@@ -28,18 +33,24 @@ margin-top:30px;
 }
 
 img{
-width:200px;
-border-radius:12px;
+width:220px;
+border-radius:14px;
+margin-top:10px;
 }
 
 button{
 margin-top:10px;
-padding:12px 20px;
+padding:14px 24px;
 font-size:18px;
 background:#00c853;
 border:none;
 color:white;
 border-radius:8px;
+}
+
+video{
+margin-top:30px;
+border-radius:12px;
 }
 
 </style>
@@ -52,6 +63,10 @@ border-radius:8px;
 
 <input id="search" placeholder="Digite o nome">
 
+<br>
+
+<video id="video" width="300" height="220" autoplay muted></video>
+
 <div id="results"></div>
 
 <script>
@@ -59,8 +74,10 @@ border-radius:8px;
 let convidados=[]
 
 fetch("https://script.google.com/macros/s/AKfycbwDJQ43LBrq35AJv09D9l6eSewvtPr5CFeW1IynURVbkosGWV_wdtT4R95Z-5TXdgcj2Q/exec")
-.then(r=>r.json())
-.then(data=>convidados=data)
+.then(res=>res.json())
+.then(data=>{
+convidados=data
+})
 
 document.getElementById("search").addEventListener("input",function(){
 
@@ -74,9 +91,15 @@ lista.forEach(p=>{
 
 html+=`
 <div class="result">
-<img src="${p.foto}" crossorigin="anonymous" referrerpolicy="no-referrer" style="width:200px;border-radius:12px;">
+
+<img src="${p.foto}" onerror="this.src='https://i.imgur.com/6VBx3io.png'">
+
 <h2>${p.nome}</h2>
-<button onclick="checkin('${p.nome}')">Liberar entrada</button>
+
+<button onclick="checkin('${p.nome}')">
+Liberar entrada
+</button>
+
 </div>
 `
 
@@ -91,6 +114,11 @@ function checkin(nome){
 alert("Entrada liberada para "+nome)
 
 }
+
+navigator.mediaDevices.getUserMedia({video:true})
+.then(stream=>{
+document.getElementById("video").srcObject=stream
+})
 
 </script>
 
