@@ -4,63 +4,38 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Portaria Evento</title>
+<title>Scanner Evento</title>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
 
 body{
 font-family:Arial;
-background:#111;
+background:black;
 color:white;
 text-align:center;
 }
 
-h1{
+#reader{
+width:320px;
+margin:auto;
 margin-top:40px;
 }
 
-#contador{
-margin-top:10px;
-font-size:20px;
-color:#00e676;
-}
-
-#search{
-font-size:22px;
-padding:12px;
-width:300px;
+#status{
+font-size:40px;
 margin-top:20px;
-border-radius:8px;
-border:none;
+padding:20px;
+border-radius:10px;
 }
 
-.result{
-margin-top:30px;
+.green{
+background:green;
 }
 
-img{
-width:220px;
-border-radius:14px;
-margin-top:10px;
-}
-
-button{
-margin-top:10px;
-padding:14px 24px;
-font-size:18px;
-background:#00c853;
-border:none;
-color:white;
-border-radius:8px;
-}
-
-button:disabled{
-background:#555;
-}
-
-video{
-margin-top:30px;
-border-radius:12px;
+.red{
+background:red;
 }
 
 </style>
@@ -69,98 +44,56 @@ border-radius:12px;
 
 <body>
 
-<h1>Portaria</h1>
+<h1>Scanner da Portaria</h1>
 
-<div id="contador">Pessoas no evento: 0</div>
+<div id="status">Aguardando QR...</div>
 
-<input id="search" placeholder="Digite o nome">
-
-<br>
-
-<video id="camera" width="300" height="220" autoplay muted></video>
-
-<div id="results"></div>
+<div id="reader"></div>
 
 <script>
 
-let convidados = []
-let total = 0
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
 
-async function carregar(){
+function onScanSuccess(decodedText){
 
-let res = await fetch("https://script.google.com/macros/s/AKfycbxTDXjL5QeonoS46RrAbD8H0aPAyF1xU7Ub4Yf3aDfA7Co0QUPrbJKMQR9idzt-nIRIHA/exec")
-
-convidados = await res.json()
-
-console.log(convidados)
-
-}
-
-carregar()
-
-document.getElementById("search").addEventListener("input",function(){
-
-let termo = this.value.toLowerCase()
-
-let lista = convidados.filter(p =>
-p.nome.toLowerCase().includes(termo)
-)
-
-let html = ""
-
-lista.forEach(p=>{
-
-html += `
-<div class="result">
-
-<img src="${p.foto}">
-
-<h2>${p.nome}</h2>
-
-<button onclick="checkin('${p.nome}')">
-Liberar entrada
-</button>
-
-</div>
-`
-
-})
-
-document.getElementById("results").innerHTML = html
-
-})
-
-function checkin(nome){
-
-fetch("https://script.google.com/macros/s/AKfycbxTDXjL5QeonoS46RrAbD8H0aPAyF1xU7Ub4Yf3aDfA7Co0QUPrbJKMQR9idzt-nIRIHA/exec",{
+fetch(SCRIPT_URL,{
 method:"POST",
-body:JSON.stringify({nome:nome})
+body:JSON.stringify({codigo:decodedText})
 })
 
-total++
+.then(res=>res.text())
+.then(res=>{
 
-document.getElementById("contador").innerText =
-"Pessoas no evento: " + total
+let status = document.getElementById("status")
 
-alert("Entrada registrada para " + nome)
+if(res=="OK"){
+
+status.className="green"
+status.innerText="ENTRADA LIBERADA"
 
 }
 
-// CAMERA (para reconhecimento facial)
+else if(res=="LIMITE"){
 
-async function iniciarCamera(){
-
-let video = document.getElementById("camera")
-
-let stream = await navigator.mediaDevices.getUserMedia({
-video:true
-})
-
-video.srcObject = stream
+status.className="red"
+status.innerText="LIMITE ATINGIDO"
 
 }
 
-iniciarCamera()
+else{
+
+status.className="red"
+status.innerText="QR INVÁLIDO"
+
+}
+
+})
+
+}
+
+let scanner = new Html5QrcodeScanner("reader",{fps:10,qrbbox:250})
+
+scanner.render(onScanSuccess)
 
 </script>
 
