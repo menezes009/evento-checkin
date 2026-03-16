@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<title>Convite do Evento</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#111;
+color:white;
+text-align:center;
+margin-top:60px;
+}
+
+#box{
+background:#222;
+padding:30px;
+border-radius:10px;
+width:320px;
+margin:auto;
+}
+
+img{
+margin-top:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="box">
+
+<h1>Seu Convite</h1>
+
+<p>Apresente este QR na entrada</p>
+
+<img id="qr">
+
+<p id="codigo"></p>
+
+</div>
+
+<script>
+
+let params = new URLSearchParams(window.location.search)
+
+let codigo = params.get("id")
+
+document.getElementById("codigo").innerText = "Código: " + codigo
+
+document.getElementById("qr").src =
+"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + codigo
+
+</script>
+
+</body>
+
+</html>
