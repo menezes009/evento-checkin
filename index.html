@@ -1,3 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<title>Portaria Evento</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#111;
+color:white;
+text-align:center;
+}
+
+h1{
+margin-top:30px;
+}
+
+#search{
+font-size:22px;
+padding:12px;
+width:300px;
+margin-top:20px;
+border-radius:8px;
+border:none;
+}
+
+.result{
+margin-top:30px;
+}
+
+img{
+width:220px;
+border-radius:14px;
+}
+
+button{
+margin-top:10px;
+padding:14px 24px;
+font-size:18px;
+background:#00c853;
+border:none;
+color:white;
+border-radius:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Portaria</h1>
+
+<input id="search" placeholder="Digite o nome">
+
+<div id="results"></div>
+
 <script>
 
 let convidados = [];
@@ -5,43 +66,49 @@ let convidados = [];
 fetch("https://script.google.com/macros/s/AKfycbxTDXjL5QeonoS46RrAbD8H0aPAyF1xU7Ub4Yf3aDfA7Co0QUPrbJKMQR9idzt-nIRIHA/exec")
 .then(response => response.json())
 .then(data => {
-    convidados = data;
-});
+convidados = data;
+})
+.catch(err => console.log(err));
 
 document.getElementById("search").addEventListener("input", function(){
 
-    let termo = this.value.toLowerCase();
+let termo = this.value.toLowerCase();
 
-    let resultados = convidados.filter(p => 
-        p.nome.toLowerCase().includes(termo)
-    );
+let lista = convidados.filter(p =>
+p.nome.toLowerCase().includes(termo)
+);
 
-    let html = "";
+let html = "";
 
-    resultados.forEach(p => {
+lista.forEach(p => {
 
-        html += `
-        <div class="result">
+html += `
+<div class="result">
 
-            <img src="${p.foto}" style="width:220px;border-radius:12px;">
+<img src="${p.foto}">
 
-            <h2>${p.nome}</h2>
+<h2>${p.nome}</h2>
 
-            <button onclick="checkin('${p.nome}')">
-            Liberar entrada
-            </button>
+<button onclick="checkin('${p.nome}')">
+Liberar entrada
+</button>
 
-        </div>
-        `;
+</div>
+`;
 
-    });
+});
 
-    document.getElementById("results").innerHTML = html;
+document.getElementById("results").innerHTML = html;
 
 });
 
 function checkin(nome){
-    alert("Entrada liberada para " + nome);
+
+alert("Entrada liberada para " + nome);
+
 }
 
 </script>
+
+</body>
+</html>
