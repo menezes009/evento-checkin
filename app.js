@@ -131,7 +131,11 @@ let html5QrcodeScanner = new Html5QrcodeScanner(
 {
 fps:10,
 qrbox:250,
-rememberLastUsedCamera:true
+rememberLastUsedCamera:false,
+supportedScanTypes:[Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+videoConstraints:{
+facingMode:"environment"
+}
 }
 )
 
