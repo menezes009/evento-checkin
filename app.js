@@ -4,7 +4,10 @@ let convidados = []
 
 async function carregar(){
 
-let res = await fetch(API)
+try{
+
+let res = await fetch(API + "?t=" + new Date().getTime())
+
 let data = await res.json()
 
 convidados = data.lista
@@ -14,28 +17,39 @@ document.getElementById("checkins").innerText = data.contador
 
 mostrarLista(convidados)
 
+}catch(e){
+
+console.log("Erro API",e)
+
 }
+
+}
+
+
 
 function mostrarLista(lista){
 
 let div = document.getElementById("lista")
+
+if(!div) return
 
 div.innerHTML = ""
 
 lista.forEach(p=>{
 
 let el = document.createElement("div")
-el.className = "item"
 
-el.innerHTML = `
+el.className="item"
+
+el.innerHTML=`
 
 <b>${p.nome}</b><br>
-
 Código: ${p.codigo}<br>
+Entradas: ${p.entradas}/${p.limite}<br>
 
-Entradas: ${p.entradas} / ${p.limite}<br><br>
-
-<button onclick="checkin('${p.codigo}')">CHECK-IN</button>
+<button onclick="checkin('${p.codigo}')">
+CHECK-IN
+</button>
 
 `
 
@@ -45,12 +59,21 @@ div.appendChild(el)
 
 }
 
+
+
 async function checkin(codigo){
 
 let res = await fetch(API,{
 
 method:"POST",
-body:JSON.stringify({codigo:codigo})
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+codigo:codigo
+})
 
 })
 
@@ -58,33 +81,33 @@ let r = await res.json()
 
 let msg = document.getElementById("mensagem")
 
+if(!msg) return
+
 if(r.status=="OK"){
 
 msg.className="liberado"
 
-msg.innerHTML = "✅ "+r.nome+" LIBERADO"
+msg.innerHTML="✅ "+r.nome+" LIBERADO"
 
-}
-
-else if(r.status=="LIMITE"){
+}else if(r.status=="LIMITE"){
 
 msg.className="bloqueado"
 
-msg.innerHTML = "❌ "+r.nome+" JÁ ENTROU"
+msg.innerHTML="❌ "+r.nome+" JÁ ENTROU"
 
-}
-
-else{
+}else{
 
 msg.className="bloqueado"
 
-msg.innerHTML = "❌ QR INVÁLIDO"
+msg.innerHTML="❌ QR INVÁLIDO"
 
 }
 
 carregar()
 
 }
+
+
 
 function iniciarScanner(){
 
@@ -101,7 +124,7 @@ qrbox:250
 
 },
 
-qrCodeMessage => {
+(qrCodeMessage)=>{
 
 checkin(qrCodeMessage)
 
@@ -111,22 +134,12 @@ checkin(qrCodeMessage)
 
 }
 
-document.getElementById("busca").addEventListener("input",function(){
 
-let v = this.value.toLowerCase()
 
-let filtrado = convidados.filter(p =>
-
-p.nome.toLowerCase().includes(v) ||
-
-p.codigo.toLowerCase().includes(v)
-
-)
-
-mostrarLista(filtrado)
-
-})
+window.onload = function(){
 
 carregar()
 
-iniciarScanner()
+setTimeout(iniciarScanner,500)
+
+}
