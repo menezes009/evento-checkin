@@ -1,10 +1,16 @@
+const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
+
 let convidados = []
 
-fetch("data.json")
-.then(res => res.json())
-.then(data => {
-convidados = data
-})
+async function carregarConvidados(){
+
+let res = await fetch(API + "?lista=1")
+
+convidados = await res.json()
+
+}
+
+carregarConvidados()
 
 document.getElementById("busca").addEventListener("input", function(){
 
@@ -24,13 +30,16 @@ let div = document.getElementById("resultado")
 
 div.innerHTML=""
 
-lista.forEach(c =>{
+lista.slice(0,10).forEach(c =>{
 
 let el = document.createElement("div")
 
 el.innerHTML = `
+<div class="card">
 <b>${c.nome}</b>
+<br>
 <button onclick="checkin('${c.codigo}')">Check-in</button>
+</div>
 `
 
 div.appendChild(el)
@@ -39,13 +48,15 @@ div.appendChild(el)
 
 }
 
-function checkin(codigo){
+async function checkin(codigo){
 
-fetch("https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec",{
+let res = await fetch(API,{
 method:"POST",
 body:JSON.stringify({codigo})
 })
 
-alert("Check-in realizado")
+let resposta = await res.text()
+
+alert(resposta)
 
 }
