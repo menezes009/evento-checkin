@@ -2,43 +2,34 @@ const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledq
 
 let convidados = []
 
-async function carregarConvidados(){
+async function carregar(){
 
-let res = await fetch(API + "?lista=1")
-
+let res = await fetch(API)
 convidados = await res.json()
+
+mostrar()
 
 }
 
-carregarConvidados()
+carregar()
 
-document.getElementById("busca").addEventListener("input", function(){
-
-let termo = this.value.toLowerCase()
-
-let filtrados = convidados.filter(c =>
-c.nome.toLowerCase().includes(termo)
-)
-
-mostrarResultados(filtrados)
-
-})
-
-function mostrarResultados(lista){
+function mostrar(){
 
 let div = document.getElementById("resultado")
-
 div.innerHTML=""
 
-lista.slice(0,10).forEach(c =>{
+convidados.forEach(c=>{
+
+let status = c.entradas + " / " + c.limite
 
 let el = document.createElement("div")
 
 el.innerHTML = `
 <div class="card">
-<b>${c.nome}</b>
+<b>Código:</b> ${c.codigo}<br>
+<b>Entradas:</b> ${status}
 <br>
-<button onclick="checkin('${c.codigo}')">Check-in</button>
+<button onclick="checkin('${c.codigo}')">CHECK-IN</button>
 </div>
 `
 
@@ -52,11 +43,23 @@ async function checkin(codigo){
 
 let res = await fetch(API,{
 method:"POST",
-body:JSON.stringify({codigo})
+body:JSON.stringify({codigo:codigo})
 })
 
-let resposta = await res.text()
+let r = await res.text()
 
-alert(resposta)
+if(r=="OK"){
+alert("Entrada liberada ✅")
+}
+
+if(r=="LIMITE"){
+alert("Limite de entradas atingido 🚫")
+}
+
+if(r=="INVALIDO"){
+alert("Código inválido ❌")
+}
+
+carregar()
 
 }
