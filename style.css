@@ -1,57 +1,66 @@
 body{
+
 font-family:Arial;
 text-align:center;
 padding:20px;
+
 }
 
 #reader{
+
 width:300px;
 margin:auto;
-}
 
-#busca{
-padding:10px;
-font-size:18px;
-width:80%;
-margin-bottom:20px;
-}
-
-.card{
-border:1px solid #ddd;
-padding:15px;
-margin:10px;
-border-radius:10px;
-}
-
-button{
-padding:10px 20px;
-font-size:18px;
 }
 
 #mensagem{
+
+font-size:26px;
 margin-top:20px;
-font-size:35px;
 font-weight:bold;
+
 }
 
 .liberado{
-background:#2ecc71;
+
+background:#16a34a;
 color:white;
-padding:40px;
-font-size:50px;
-border-radius:15px;
+padding:20px;
+border-radius:10px;
+
 }
 
 .bloqueado{
-background:#e74c3c;
+
+background:#dc2626;
 color:white;
-padding:40px;
-font-size:50px;
-border-radius:15px;
+padding:20px;
+border-radius:10px;
+
+}
+
+.item{
+
+border:1px solid #ddd;
+padding:10px;
+margin:10px;
+border-radius:10px;
+
+}
+
+button{
+
+padding:10px 20px;
+border:none;
+background:#2563eb;
+color:white;
+border-radius:6px;
+
 }
 
 #contador{
-font-size:50px;
+
+font-size:40px;
 font-weight:bold;
-margin-top:20px;
+
 }
