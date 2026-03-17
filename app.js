@@ -65,17 +65,10 @@ async function checkin(codigo){
 
 try{
 
-let res = await fetch(API,{
+// envia o código pela URL (compatível com Apps Script)
+let res = await fetch(API + "?codigo=" + encodeURIComponent(codigo) + "&t=" + Date.now(),{
 
-method:"POST",
-
-headers:{
-"Content-Type":"text/plain;charset=utf-8"
-},
-
-body:JSON.stringify({
-codigo:codigo
-})
+method:"POST"
 
 })
 
@@ -88,14 +81,18 @@ if(!msg) return
 if(r.status=="OK"){
 
 msg.className="liberado"
-msg.innerHTML="✅ "+r.nome+" LIBERADO"
+msg.innerHTML="✅ " + r.nome + " LIBERADO"
 
-}else if(r.status=="LIMITE"){
+}
+
+else if(r.status=="LIMITE"){
 
 msg.className="bloqueado"
-msg.innerHTML="❌ "+r.nome+" JÁ ENTROU"
+msg.innerHTML="❌ " + r.nome + " JÁ ENTROU"
 
-}else{
+}
+
+else{
 
 msg.className="bloqueado"
 msg.innerHTML="❌ QR INVÁLIDO"
@@ -120,7 +117,7 @@ const html5QrCode = new Html5Qrcode("reader")
 
 html5QrCode.start(
 
-{ facingMode: { exact: "environment" } },
+{ facingMode: "environment" },
 
 {
 fps:10,
