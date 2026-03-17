@@ -1,21 +1,17 @@
-const API="https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
+const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
 
-let convidados=[]
-let scanner
-let ultimo=null
-
-
+let convidados = []
 
 async function carregar(){
 
-let res=await fetch(API)
-let data=await res.json()
+let res = await fetch(API)
+let data = await res.json()
 
-convidados=data.lista
+convidados = data.lista
 
-let total=convidados.filter(c=>c.entradas>0).length
+let total = convidados.filter(c => c.entradas > 0).length
 
-document.getElementById("contador").innerText=total
+document.getElementById("contador").innerText = total
 
 }
 
@@ -25,16 +21,16 @@ carregar()
 
 // BUSCA
 
-document.getElementById("busca").addEventListener("input",function(){
+document.getElementById("busca").addEventListener("input", function(){
 
-let termo=this.value.toLowerCase()
+let termo = this.value.toLowerCase()
 
-let lista=convidados.filter(c=>
-(c.nome&&c.nome.toLowerCase().includes(termo))||
-(c.codigo&&c.codigo.toLowerCase().includes(termo))
+let filtrados = convidados.filter(c =>
+(c.nome && c.nome.toLowerCase().includes(termo)) ||
+(c.codigo && c.codigo.toLowerCase().includes(termo))
 )
 
-mostrar(lista.slice(0,10))
+mostrar(filtrados.slice(0,10))
 
 })
 
@@ -42,8 +38,7 @@ mostrar(lista.slice(0,10))
 
 function mostrar(lista){
 
-let div=document.getElementById("resultado")
-
+let div = document.getElementById("resultado")
 div.innerHTML=""
 
 lista.forEach(c=>{
@@ -67,11 +62,9 @@ div.appendChild(el)
 
 
 
-// CHECKIN
-
 async function checkin(codigo){
 
-let res=await fetch(API,{
+let res = await fetch(API,{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -79,18 +72,15 @@ headers:{
 body:JSON.stringify({codigo:codigo})
 })
 
-let r=await res.json()
+let r = await res.json()
 
-let msg=document.getElementById("mensagem")
+let msg = document.getElementById("mensagem")
 
 if(r.status=="OK"){
 
-document.getElementById("ok").play()
-
 msg.innerHTML=`
-<div class="liberado">
-LIBERADO<br>
-${r.nome}
+<div style="background:#27ae60;color:white;font-size:32px;padding:25px;border-radius:12px;margin-top:20px;">
+✅ ${r.nome} LIBERADO
 </div>
 `
 
@@ -98,12 +88,9 @@ ${r.nome}
 
 else if(r.status=="LIMITE"){
 
-document.getElementById("erro").play()
-
 msg.innerHTML=`
-<div class="bloqueado">
-JÁ ENTROU<br>
-${r.nome}
+<div style="background:#e74c3c;color:white;font-size:32px;padding:25px;border-radius:12px;margin-top:20px;">
+🚫 ${r.nome} JÁ ENTROU
 </div>
 `
 
@@ -111,7 +98,11 @@ ${r.nome}
 
 else{
 
-msg.innerHTML=`<div class="bloqueado">QR INVÁLIDO</div>`
+msg.innerHTML=`
+<div style="background:#c0392b;color:white;font-size:32px;padding:25px;border-radius:12px;margin-top:20px;">
+QR INVÁLIDO
+</div>
+`
 
 }
 
@@ -121,42 +112,33 @@ carregar()
 
 
 
-// SCANNER
+// SCANNER QR
 
 function iniciarScanner(){
 
-scanner=new Html5Qrcode("reader")
+const html5QrCode = new Html5Qrcode("reader")
 
-Html5Qrcode.getCameras().then(cameras=>{
+Html5QrCode.getCameras().then(cameras => {
 
-let traseira=cameras.find(c=>
-c.label.toLowerCase().includes("back")||
-c.label.toLowerCase().includes("rear")||
+let traseira = cameras.find(c =>
+c.label.toLowerCase().includes("back") ||
 c.label.toLowerCase().includes("traseira")
 )
 
-let id=traseira?traseira.id:cameras[cameras.length-1].id
+let camera = traseira ? traseira.id : cameras[0].id
 
-scanner.start(
-id,
+html5QrCode.start(
+camera,
 {
-fps:15,
-qrbox:{width:250,height:250}
+fps:10,
+qrbox:250
 },
 (decodedText)=>{
 
-if(decodedText==ultimo)return
-
-ultimo=decodedText
-
 checkin(decodedText)
 
-setTimeout(()=>{
-ultimo=null
-},2000)
-
 },
-(err)=>{}
+(error)=>{}
 
 )
 
@@ -167,5 +149,7 @@ ultimo=null
 iniciarScanner()
 
 
+
+// atualiza contador automaticamente
 
 setInterval(carregar,5000)
