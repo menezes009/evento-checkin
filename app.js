@@ -1,145 +1,91 @@
-const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
+function doGet() {
+
+const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+const dados = sheet.getDataRange().getValues();
 
 let convidados = []
+let totalCheckin = 0
 
-async function carregar(){
-  const res = await fetch(API)
-  const data = await res.json()
+for(let i=1;i<dados.length;i++){
 
-  convidados = data.lista || []
+let nome = dados[i][1]
+let codigo = dados[i][3]
 
-  const total = convidados.filter(c => (c.entradas || 0) > 0).length
-  const contador = document.getElementById("contador")
-  if (contador) contador.innerText = total
+if(!codigo) continue
+
+let entradas = dados[i][9] || 0
+let limite = dados[i][10] || 1
+
+if(entradas > 0) totalCheckin++
+
+convidados.push({
+nome:nome,
+codigo:codigo,
+entradas:entradas,
+limite:limite
+})
+
 }
 
-carregar()
+return ContentService
+.createTextOutput(JSON.stringify({
+lista: convidados,
+contador: totalCheckin
+}))
+.setMimeType(ContentService.MimeType.JSON)
 
-
-
-// BUSCA
-const busca = document.getElementById("busca")
-if (busca){
-  busca.addEventListener("input", function(){
-    const termo = this.value.toLowerCase()
-
-    const filtrados = convidados.filter(c =>
-      (c.nome && c.nome.toLowerCase().includes(termo)) ||
-      (c.codigo && c.codigo.toLowerCase().includes(termo))
-    )
-
-    mostrar(filtrados.slice(0,10))
-  })
-}
-
-
-
-function mostrar(lista){
-  const div = document.getElementById("resultado")
-  if (!div) return
-
-  div.innerHTML=""
-
-  lista.forEach(c=>{
-    const el=document.createElement("div")
-    el.className="card"
-
-    el.innerHTML=`
-      <b>${c.nome}</b><br>
-      Código: ${c.codigo}<br>
-      Entradas: ${c.entradas} / ${c.limite}<br>
-      <button onclick="checkin('${c.codigo}')">CHECK-IN</button>
-    `
-
-    div.appendChild(el)
-  })
 }
 
 
 
-// CHECKIN
-async function checkin(codigo){
-  try{
+function doPost(e){
 
-    const res = await fetch(API,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body: JSON.stringify({codigo: codigo})
-    })
+const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+const dados = sheet.getDataRange().getValues();
 
-    const r = await res.json()
+let body = JSON.parse(e.postData.contents)
+let codigo = String(body.codigo).trim()
 
-    const msg = document.getElementById("mensagem")
+for(let i=1;i<dados.length;i++){
 
-    if(r.status === "OK"){
-      msg.innerHTML = `
-      <div style="background:#27ae60;color:white;font-size:32px;padding:25px;border-radius:12px;margin-top:20px;">
-        ✅ ${r.nome} LIBERADO
-      </div>`
-    }
+let codigoPlanilha = String(dados[i][3]).trim()
 
-    else if(r.status === "LIMITE"){
-      msg.innerHTML = `
-      <div style="background:#e74c3c;color:white;font-size:32px;padding:25px;border-radius:12px;margin-top:20px;">
-        🚫 ${r.nome} JÁ ENTROU
-      </div>`
-    }
+if(codigoPlanilha === codigo){
 
-    else{
-      msg.innerHTML = `
-      <div style="background:#c0392b;color:white;font-size:32px;padding:25px;border-radius:12px;margin-top:20px;">
-        QR INVÁLIDO
-      </div>`
-    }
+let nome = dados[i][1]
+let entradas = dados[i][9] || 0
+let limite = dados[i][10] || 1
 
-    carregar()
+if(entradas >= limite){
 
-  }catch(e){
-    console.error("Erro no checkin:", e)
-  }
+return ContentService
+.createTextOutput(JSON.stringify({
+status:"LIMITE",
+nome:nome
+}))
+.setMimeType(ContentService.MimeType.JSON)
+
 }
 
+sheet.getRange(i+1,10).setValue(entradas + 1)
+sheet.getRange(i+1,8).setValue("CHECK-IN")
+sheet.getRange(i+1,9).setValue(new Date())
 
+return ContentService
+.createTextOutput(JSON.stringify({
+status:"OK",
+nome:nome
+}))
+.setMimeType(ContentService.MimeType.JSON)
 
-// SCANNER QR
-function iniciarScanner(){
-
-  const html5QrCode = new Html5Qrcode("reader")
-
-  Html5Qrcode.getCameras().then(cameras => {
-
-    if(!cameras.length){
-      alert("Nenhuma câmera encontrada")
-      return
-    }
-
-    const traseira = cameras.find(c =>
-      c.label.toLowerCase().includes("back") ||
-      c.label.toLowerCase().includes("traseira")
-    )
-
-    const camera = traseira ? traseira.id : cameras[0].id
-
-    html5QrCode.start(
-      camera,
-      {
-        fps:10,
-        qrbox:250
-      },
-      (decodedText)=>{
-        checkin(decodedText)
-      },
-      (error)=>{}
-    )
-
-  })
 }
 
-iniciarScanner()
+}
 
+return ContentService
+.createTextOutput(JSON.stringify({
+status:"INVALIDO"
+}))
+.setMimeType(ContentService.MimeType.JSON)
 
-
-// atualiza contador automaticamente
-setInterval(carregar,5000)
+}
