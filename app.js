@@ -59,15 +59,54 @@ let r = await res.text()
 let msg = document.getElementById("mensagem")
 
 if(r=="OK"){
-msg.innerHTML='<div class="ok">Entrada liberada ✔</div>'
+
+msg.innerHTML=`
+<div style="
+background:#27ae60;
+color:white;
+font-size:35px;
+padding:25px;
+border-radius:10px;
+margin-top:20px;
+font-weight:bold;">
+✅ Entrada liberada
+</div>
+`
+
 }
 
 else if(r=="LIMITE"){
-msg.innerHTML='<div class="erro">Limite atingido</div>'
+
+msg.innerHTML=`
+<div style="
+background:#e74c3c;
+color:white;
+font-size:35px;
+padding:25px;
+border-radius:10px;
+margin-top:20px;
+font-weight:bold;">
+🚫 Já entrou
+</div>
+`
+
 }
 
-else if(r=="INVALIDO"){
-msg.innerHTML='<div class="erro">Código inválido</div>'
+else{
+
+msg.innerHTML=`
+<div style="
+background:#c0392b;
+color:white;
+font-size:35px;
+padding:25px;
+border-radius:10px;
+margin-top:20px;
+font-weight:bold;">
+QR inválido
+</div>
+`
+
 }
 
 carregar()
@@ -78,7 +117,6 @@ function onScanSuccess(decodedText){
 
 checkin(decodedText)
 
-// reinicia scanner após leitura
 setTimeout(()=>{
 html5QrcodeScanner.clear().then(()=>{
 html5QrcodeScanner.render(onScanSuccess)
@@ -91,7 +129,8 @@ let html5QrcodeScanner = new Html5QrcodeScanner(
 "reader",
 {
 fps:10,
-qrbox:250,
+qrbox:{width:300,height:300},
+aspectRatio:1,
 rememberLastUsedCamera:false,
 videoConstraints:{
 facingMode:"environment"
