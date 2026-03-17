@@ -49,36 +49,41 @@ async function checkin(codigo){
 
 let res = await fetch(API,{
 method:"POST",
-body:JSON.stringify({codigo:codigo})
+body:JSON.stringify({codigo})
 })
 
-let r = await res.text()
+let r = await res.json()
 
 let msg = document.getElementById("mensagem")
 
-if(r=="OK"){
-msg.innerHTML='<div class="ok">Entrada liberada ✔</div>'
-}
+if(r.status=="OK"){
 
-else if(r=="LIMITE"){
-msg.innerHTML='<div class="erro">Limite atingido</div>'
-}
-
-else if(r=="INVALIDO"){
-msg.innerHTML='<div class="erro">Código inválido</div>'
-}
-
-carregar()
+msg.innerHTML = `
+<div class="liberado">
+✅ ${r.nome} LIBERADO
+</div>
+`
 
 }
 
-function onScanSuccess(decodedText) {
-checkin(decodedText)
+if(r.status=="LIMITE"){
+
+msg.innerHTML = `
+<div class="bloqueado">
+🚫 ${r.nome} JÁ ENTROU
+</div>
+`
+
 }
 
-let html5QrcodeScanner = new Html5QrcodeScanner(
-"reader",
-{ fps: 10, qrbox: 250 }
-)
+if(r.status=="INVALIDO"){
 
-html5QrcodeScanner.render(onScanSuccess)
+msg.innerHTML = `
+<div class="bloqueado">
+QR INVÁLIDO
+</div>
+`
+
+}
+
+}
