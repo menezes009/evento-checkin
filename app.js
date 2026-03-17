@@ -176,7 +176,11 @@ html5QrcodeScanner.render(onScanSuccess)
 
 let html5QrcodeScanner = new Html5QrcodeScanner(
 "reader",
-{ fps: 10, qrbox: 250 }
+{
+fps:10,
+qrbox:250,
+rememberLastUsedCamera:true
+}
 )
 
 html5QrcodeScanner.render(onScanSuccess)
