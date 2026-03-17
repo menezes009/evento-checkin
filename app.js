@@ -189,3 +189,10 @@ html5QrcodeScanner.render(onScanSuccess)
 
 setInterval(carregar,3000)
 carregar()
+function reiniciarScanner(){
+
+html5QrcodeScanner.clear().then(()=>{
+html5QrcodeScanner.render(onScanSuccess)
+})
+
+}
