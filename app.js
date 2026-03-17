@@ -1,6 +1,8 @@
 const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
 
 let convidados = []
+let scanner = null
+let scannerRodando = false
 
 const somOk = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg")
 const somErro = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg")
@@ -32,7 +34,6 @@ console.log("Erro API",e)
 function mostrarLista(lista){
 
 let div = document.getElementById("lista")
-
 if(!div) return
 
 div.innerHTML = ""
@@ -47,7 +48,6 @@ return
 lista.forEach(p=>{
 
 let el = document.createElement("div")
-
 el.className="item"
 
 el.innerHTML=`
@@ -73,7 +73,6 @@ div.appendChild(el)
 function mostrarEntradas(lista){
 
 let div = document.getElementById("entradas")
-
 if(!div) return
 
 div.innerHTML = ""
@@ -84,9 +83,7 @@ lista
 .forEach(p=>{
 
 let el = document.createElement("div")
-
 el.className="entrada"
-
 el.innerHTML = "✔ " + p.nome
 
 div.appendChild(el)
@@ -102,21 +99,17 @@ async function checkin(codigo){
 try{
 
 let res = await fetch(API + "?codigo=" + encodeURIComponent(codigo) + "&t=" + Date.now(),{
-
 method:"POST"
-
 })
 
 let r = await res.json()
 
 let msg = document.getElementById("mensagem")
-
 if(!msg) return
 
 if(r.status=="OK"){
 
 somOk.play()
-
 msg.className="liberado"
 msg.innerHTML="✅ " + r.nome + " LIBERADO"
 
@@ -125,7 +118,6 @@ msg.innerHTML="✅ " + r.nome + " LIBERADO"
 else if(r.status=="LIMITE"){
 
 somErro.play()
-
 msg.className="bloqueado"
 msg.innerHTML="❌ " + r.nome + " JÁ ENTROU"
 
@@ -134,7 +126,6 @@ msg.innerHTML="❌ " + r.nome + " JÁ ENTROU"
 else{
 
 somErro.play()
-
 msg.className="bloqueado"
 msg.innerHTML="❌ QR INVÁLIDO"
 
@@ -152,11 +143,25 @@ console.log("Erro checkin",e)
 
 
 
+function extrairCodigo(texto){
+
+let codigo = texto.trim()
+
+if(codigo.includes("EVT")){
+codigo = codigo.substring(codigo.indexOf("EVT"), codigo.indexOf("EVT")+7)
+}
+
+return codigo
+
+}
+
+
+
 function iniciarScanner(){
 
-const html5QrCode = new Html5Qrcode("reader")
+scanner = new Html5Qrcode("reader")
 
-html5QrCode.start(
+scanner.start(
 
 { facingMode: "environment" },
 
@@ -167,11 +172,31 @@ qrbox:250
 
 (qrCodeMessage)=>{
 
-checkin(qrCodeMessage)
+if(!scannerRodando) return
+
+scannerRodando = false
+
+let codigo = extrairCodigo(qrCodeMessage)
+
+scanner.stop().then(()=>{
+
+checkin(codigo)
+
+setTimeout(()=>{
+
+iniciarScanner()
+
+},2000)
+
+})
 
 }
 
-).catch(err => {
+).then(()=>{
+
+scannerRodando = true
+
+}).catch(err => {
 
 console.log("Erro câmera",err)
 
