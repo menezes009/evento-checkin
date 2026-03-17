@@ -1,48 +1,56 @@
 const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
 
-let convidados = []
+let html5QrCode
 
-async function carregar(){
-let res = await fetch(API)
-convidados = await res.json()
+function iniciarScanner(){
+
+html5QrCode = new Html5Qrcode("reader")
+
+Html5Qrcode.getCameras().then(devices => {
+
+if(!devices.length){
+alert("Nenhuma câmera encontrada")
+return
 }
 
-carregar()
+// tenta encontrar câmera traseira
+let cameraId = devices[0].id
 
-document.getElementById("busca").addEventListener("input", function(){
-let termo = this.value.toLowerCase()
+devices.forEach(cam => {
 
-let filtrados = convidados.filter(c =>
-(c.nome && c.nome.toLowerCase().includes(termo)) ||
-(c.codigo && c.codigo.toLowerCase().includes(termo))
+let label = cam.label.toLowerCase()
+
+if(
+label.includes("back") ||
+label.includes("rear") ||
+label.includes("traseira") ||
+label.includes("environment")
+){
+cameraId = cam.id
+}
+
+})
+
+html5QrCode.start(
+cameraId,
+{
+fps:10,
+qrbox:250
+},
+(decodedText)=>{
+
+checkin(decodedText)
+
+},
+(errorMessage)=>{}
+
 )
 
-mostrar(filtrados.slice(0,10))
-})
-
-function mostrar(lista){
-
-let div = document.getElementById("resultado")
-div.innerHTML=""
-
-lista.forEach(c=>{
-
-let el=document.createElement("div")
-
-el.className="card"
-
-el.innerHTML=`
-<b>${c.nome}</b><br>
-Código: ${c.codigo}<br>
-Entradas: ${c.entradas} / ${c.limite}<br>
-<button onclick="checkin('${c.codigo}')">CHECK-IN</button>
-`
-
-div.appendChild(el)
-
 })
 
 }
+
+
 
 async function checkin(codigo){
 
@@ -60,11 +68,11 @@ let msg = document.getElementById("mensagem")
 
 if(r=="OK"){
 
-msg.innerHTML = `
+msg.innerHTML=`
 <div style="
 background:#27ae60;
 color:white;
-font-size:40px;
+font-size:35px;
 padding:25px;
 border-radius:10px;
 margin-top:20px;
@@ -77,7 +85,7 @@ font-weight:bold;">
 
 else if(r=="LIMITE"){
 
-msg.innerHTML = `
+msg.innerHTML=`
 <div style="
 background:#e74c3c;
 color:white;
@@ -92,9 +100,9 @@ font-weight:bold;">
 
 }
 
-else if(r=="INVALIDO"){
+else{
 
-msg.innerHTML = `
+msg.innerHTML=`
 <div style="
 background:#c0392b;
 color:white;
@@ -109,34 +117,8 @@ QR inválido
 
 }
 
-carregar()
-
 }
 
-function onScanSuccess(decodedText){
 
-checkin(decodedText)
 
-// reinicia scanner após leitura
-setTimeout(()=>{
-html5QrcodeScanner.clear().then(()=>{
-html5QrcodeScanner.render(onScanSuccess)
-})
-},1500)
-
-}
-
-let html5QrcodeScanner = new Html5QrcodeScanner(
-"reader",
-{
-fps:10,
-qrbox:250,
-rememberLastUsedCamera:false,
-supportedScanTypes:[Html5QrcodeScanType.SCAN_TYPE_CAMERA],
-videoConstraints:{
-facingMode:"environment"
-}
-}
-)
-
-html5QrcodeScanner.render(onScanSuccess)
+iniciarScanner()
