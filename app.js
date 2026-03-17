@@ -1,6 +1,8 @@
 const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
 
 let html5QrCode
+let cameras = []
+let cameraIndex = 0
 
 
 
@@ -36,11 +38,11 @@ div.innerHTML=""
 
 lista.forEach(function(p){
 
-if(p.entradas > 0){
+if(p.entradas>0){
 
 let el = document.createElement("div")
 el.className="item"
-el.innerHTML="✔ " + p.nome
+el.innerHTML="✔ "+p.nome
 
 div.appendChild(el)
 
@@ -66,9 +68,11 @@ let r = await res.json()
 
 let msg = document.getElementById("mensagem")
 
+
+
 if(r.status=="OK"){
 
-msg.innerHTML = `
+msg.innerHTML=`
 <div style="
 position:fixed;
 top:0;
@@ -81,20 +85,20 @@ display:flex;
 align-items:center;
 justify-content:center;
 font-size:50px;
-font-weight:bold;
-text-align:center;
-z-index:9999;">
+font-weight:bold;">
 ✅ ${r.nome} LIBERADO
 </div>
 `
 
-setTimeout(()=>{ msg.innerHTML="" },2500)
+setTimeout(()=>{msg.innerHTML=""},2500)
 
 }
 
+
+
 else if(r.status=="LIMITE"){
 
-msg.innerHTML = `
+msg.innerHTML=`
 <div style="
 position:fixed;
 top:0;
@@ -107,20 +111,20 @@ display:flex;
 align-items:center;
 justify-content:center;
 font-size:45px;
-font-weight:bold;
-text-align:center;
-z-index:9999;">
+font-weight:bold;">
 🚫 ${r.nome} JÁ ENTROU
 </div>
 `
 
-setTimeout(()=>{ msg.innerHTML="" },2500)
+setTimeout(()=>{msg.innerHTML=""},2500)
 
 }
 
+
+
 else{
 
-msg.innerHTML = `
+msg.innerHTML=`
 <div style="
 position:fixed;
 top:0;
@@ -133,14 +137,12 @@ display:flex;
 align-items:center;
 justify-content:center;
 font-size:45px;
-font-weight:bold;
-text-align:center;
-z-index:9999;">
+font-weight:bold;">
 QR INVÁLIDO
 </div>
 `
 
-setTimeout(()=>{ msg.innerHTML="" },2500)
+setTimeout(()=>{msg.innerHTML=""},2500)
 
 }
 
@@ -156,51 +158,58 @@ html5QrCode = new Html5Qrcode("reader")
 
 Html5Qrcode.getCameras().then(devices => {
 
-if(!devices || devices.length === 0){
+cameras = devices
+
+if(!devices.length){
 alert("Nenhuma câmera encontrada")
 return
 }
 
-// tenta encontrar câmera traseira
-let cameraId = devices[0].id
-
-devices.forEach(cam => {
-
-let label = cam.label.toLowerCase()
-
-if(
-label.includes("back") ||
-label.includes("rear") ||
-label.includes("traseira") ||
-label.includes("environment")
-){
-cameraId = cam.id
-}
+startCamera()
 
 })
 
+}
+
+
+
+function startCamera(){
+
 html5QrCode.start(
-cameraId,
+
+cameras[cameraIndex].id,
+
 {
 fps:10,
 qrbox:250
 },
-(decodedText)=>{
-checkin(decodedText)
-},
-(errorMessage)=>{}
-)
 
-})
+(decodedText)=>{
+
+checkin(decodedText)
+
+},
+
+(errorMessage)=>{}
+
+)
 
 }
 
 
 
-function reiniciarScanner(){
+function trocarCamera(){
 
 html5QrCode.stop().then(()=>{
-iniciarScanner()
+
+cameraIndex++
+
+if(cameraIndex >= cameras.length){
+cameraIndex = 0
+}
+
+startCamera()
+
 })
 
 }
