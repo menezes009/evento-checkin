@@ -1,58 +1,48 @@
 const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
 
-let html5QrCode
-let cameras = []
-let cameraIndex = 0
-
-
+let convidados = []
 
 async function carregar(){
-
-try{
-
 let res = await fetch(API)
-let data = await res.json()
-
-if(data.contador !== undefined){
-document.getElementById("contador").innerText = data.contador
+convidados = await res.json()
 }
 
-if(data.lista){
-mostrarLista(data.lista)
-}
+carregar()
 
-}catch(err){
+document.getElementById("busca").addEventListener("input", function(){
+let termo = this.value.toLowerCase()
 
-console.log("Erro ao carregar dados", err)
+let filtrados = convidados.filter(c =>
+(c.nome && c.nome.toLowerCase().includes(termo)) ||
+(c.codigo && c.codigo.toLowerCase().includes(termo))
+)
 
-}
+mostrar(filtrados.slice(0,10))
+})
 
-}
+function mostrar(lista){
 
-
-
-function mostrarLista(lista){
-
-let div = document.getElementById("lista")
+let div = document.getElementById("resultado")
 div.innerHTML=""
 
-lista.forEach(function(p){
+lista.forEach(c=>{
 
-if(p.entradas>0){
+let el=document.createElement("div")
 
-let el = document.createElement("div")
-el.className="item"
-el.innerHTML="✔ "+p.nome
+el.className="card"
+
+el.innerHTML=`
+<b>${c.nome}</b><br>
+Código: ${c.codigo}<br>
+Entradas: ${c.entradas} / ${c.limite}<br>
+<button onclick="checkin('${c.codigo}')">CHECK-IN</button>
+`
 
 div.appendChild(el)
-
-}
 
 })
 
 }
-
-
 
 async function checkin(codigo){
 
@@ -64,85 +54,58 @@ headers:{
 body:JSON.stringify({codigo:codigo})
 })
 
-let r = await res.json()
+let r = await res.text()
 
 let msg = document.getElementById("mensagem")
 
+if(r=="OK"){
 
-
-if(r.status=="OK"){
-
-msg.innerHTML=`
+msg.innerHTML = `
 <div style="
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
 background:#27ae60;
 color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:50px;
+font-size:40px;
+padding:25px;
+border-radius:10px;
+margin-top:20px;
 font-weight:bold;">
-✅ ${r.nome} LIBERADO
+✅ Entrada liberada
 </div>
 `
 
-setTimeout(()=>{msg.innerHTML=""},2500)
-
 }
 
+else if(r=="LIMITE"){
 
-
-else if(r.status=="LIMITE"){
-
-msg.innerHTML=`
+msg.innerHTML = `
 <div style="
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
 background:#e74c3c;
 color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:45px;
+font-size:35px;
+padding:25px;
+border-radius:10px;
+margin-top:20px;
 font-weight:bold;">
-🚫 ${r.nome} JÁ ENTROU
+🚫 Já entrou
 </div>
 `
-
-setTimeout(()=>{msg.innerHTML=""},2500)
 
 }
 
+else if(r=="INVALIDO"){
 
-
-else{
-
-msg.innerHTML=`
+msg.innerHTML = `
 <div style="
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
 background:#c0392b;
 color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:45px;
+font-size:35px;
+padding:25px;
+border-radius:10px;
+margin-top:20px;
 font-weight:bold;">
-QR INVÁLIDO
+QR inválido
 </div>
 `
-
-setTimeout(()=>{msg.innerHTML=""},2500)
 
 }
 
@@ -150,73 +113,26 @@ carregar()
 
 }
 
-
-
-function iniciarScanner(){
-
-html5QrCode = new Html5Qrcode("reader")
-
-Html5Qrcode.getCameras().then(devices => {
-
-cameras = devices
-
-if(!devices.length){
-alert("Nenhuma câmera encontrada")
-return
-}
-
-startCamera()
-
-})
-
-}
-
-
-
-function startCamera(){
-
-html5QrCode.start(
-
-cameras[cameraIndex].id,
-
-{
-fps:10,
-qrbox:250
-},
-
-(decodedText)=>{
+function onScanSuccess(decodedText){
 
 checkin(decodedText)
 
-},
+// reinicia scanner após leitura
+setTimeout(()=>{
+html5QrcodeScanner.clear().then(()=>{
+html5QrcodeScanner.render(onScanSuccess)
+})
+},1500)
 
-(errorMessage)=>{}
+}
 
+let html5QrcodeScanner = new Html5QrcodeScanner(
+"reader",
+{
+fps:10,
+qrbox:250,
+rememberLastUsedCamera:true
+}
 )
 
-}
-
-
-
-function trocarCamera(){
-
-html5QrCode.stop().then(()=>{
-
-cameraIndex++
-
-if(cameraIndex >= cameras.length){
-cameraIndex = 0
-}
-
-startCamera()
-
-})
-
-}
-
-
-
-iniciarScanner()
-
-setInterval(carregar,3000)
-carregar()
+html5QrcodeScanner.render(onScanSuccess)
