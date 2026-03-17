@@ -4,53 +4,28 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Scanner Evento</title>
-
-<script src="https://unpkg.com/html5-qrcode"></script>
+<title>Painel Evento</title>
 
 <style>
 
 body{
 font-family:Arial;
-background:black;
+background:#111;
 color:white;
 text-align:center;
 }
 
-h1{
-margin-top:30px;
+.box{
+background:#222;
+padding:20px;
+margin:20px;
+border-radius:10px;
+font-size:30px;
 }
 
-#reader{
-width:320px;
-margin:auto;
-margin-top:30px;
-}
-
-#status{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:50px;
-font-weight:bold;
-z-index:999;
-}
-
-.green{
-background:#00c853;
-}
-
-.red{
-background:#d50000;
-}
-
-.hidden{
-display:none;
+button{
+padding:15px;
+font-size:18px;
 }
 
 </style>
@@ -59,76 +34,62 @@ display:none;
 
 <body>
 
-<h1>Scanner do Evento</h1>
+<h1>Painel do Evento</h1>
 
-<div id="reader"></div>
+<div class="box">
+Entradas: <span id="total">0</span>
+</div>
 
-<div id="status" class="hidden"></div>
+<div class="box">
+Acompanhantes: <span id="acomp">0</span>
+</div>
+
+<button onclick="reset()">Reiniciar Evento</button>
 
 <script>
 
-const SCRIPT_URL="const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec""
+const SCRIPT="https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
 
-function mostrar(cor,texto){
+function carregar(){
 
-let tela=document.getElementById("status")
+fetch(SCRIPT)
+.then(r=>r.json())
+.then(d=>{
 
-tela.className=cor
-tela.innerText=texto
+let total=0
+let acomp=0
 
-setTimeout(()=>{
-tela.className="hidden"
-},2000)
+d.forEach(p=>{
+
+total+=p.entradas
+
+if(p.entradas>1){
+acomp+=p.entradas-1
+}
+
+})
+
+document.getElementById("total").innerText=total
+document.getElementById("acomp").innerText=acomp
+
+})
 
 }
 
-function onScanSuccess(decodedText){
+function reset(){
 
-fetch(SCRIPT_URL,{
+fetch(SCRIPT,{
 method:"POST",
-body:JSON.stringify({codigo:decodedText})
-})
-.then(res=>res.text())
-.then(res=>{
-
-if(res=="OK"){
-
-mostrar("green","ENTRADA LIBERADA")
-
-}
-
-else if(res=="LIMITE"){
-
-mostrar("red","ACOMPANHANTE ESGOTADO")
-
-}
-
-else{
-
-mostrar("red","QR INVÁLIDO")
-
-}
-
+body:JSON.stringify({reset:true})
 })
 
-}
-
-function iniciarScanner(){
-
-const html5QrCode = new Html5Qrcode("reader");
-
-html5QrCode.start(
-{ facingMode: "environment" },
-{
-fps:10,
-qrbox:250
-},
-onScanSuccess
-);
+alert("Evento reiniciado")
 
 }
 
-iniciarScanner()
+setInterval(carregar,3000)
+
+carregar()
 
 </script>
 
