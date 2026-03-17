@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <title>Scanner Evento</title>
 
-<script src="https://unpkg.com/html5-qrcode@2.3.8"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
 
@@ -25,12 +25,6 @@ margin-top:40px;
 width:320px;
 margin:auto;
 margin-top:30px;
-}
-
-button{
-padding:15px;
-font-size:20px;
-margin-top:20px;
 }
 
 #status{
@@ -58,15 +52,13 @@ font-weight:bold;
 
 <h1>Scanner do Evento</h1>
 
-<button onclick="start()">Abrir câmera</button>
-
 <div id="reader"></div>
 
 <div id="status" class="hidden"></div>
 
 <script>
 
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
+const SCRIPT="https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
 
 function tela(cor,texto){
 
@@ -83,7 +75,7 @@ s.className="hidden"
 
 function sucesso(qr){
 
-fetch(SCRIPT_URL,{
+fetch(SCRIPT,{
 method:"POST",
 body:JSON.stringify({codigo:qr})
 })
@@ -95,7 +87,7 @@ tela("green","ENTRADA LIBERADA")
 }
 
 else if(res=="LIMITE"){
-tela("red","LIMITE ATINGIDO")
+tela("red","ACOMP ESGOTADO")
 }
 
 else{
@@ -106,20 +98,13 @@ tela("red","QR INVÁLIDO")
 
 }
 
-function start(){
-
-const scanner=new Html5Qrcode("reader")
-
-scanner.start(
-{facingMode:"environment"},
-{
-fps:10,
-qrbox:250
-},
-sucesso
+const scanner = new Html5QrcodeScanner(
+"reader",
+{fps:10, qrbox:250},
+false
 )
 
-}
+scanner.render(sucesso)
 
 </script>
 
