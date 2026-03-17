@@ -92,7 +92,7 @@ z-index:9999;">
 
 setTimeout(()=>{
 msg.innerHTML=""
-},3000)
+},2500)
 
 }
 
@@ -122,7 +122,7 @@ z-index:9999;">
 
 setTimeout(()=>{
 msg.innerHTML=""
-},3000)
+},2500)
 
 }
 
@@ -152,7 +152,7 @@ QR INVÁLIDO
 
 setTimeout(()=>{
 msg.innerHTML=""
-},3000)
+},2500)
 
 }
 
@@ -166,14 +166,8 @@ function iniciarScanner(){
 
 html5QrCode = new Html5Qrcode("reader")
 
-Html5Qrcode.getCameras().then(devices => {
-
-if(devices && devices.length){
-
-let cameraId = devices[0].id
-
 html5QrCode.start(
-cameraId,
+{ facingMode: "environment" },   // força câmera traseira
 {
 fps:10,
 qrbox:250
@@ -186,10 +180,6 @@ checkin(decodedText)
 (errorMessage)=>{}
 
 )
-
-}
-
-})
 
 }
 
