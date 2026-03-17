@@ -21,25 +21,24 @@ let filtrados = convidados.filter(c =>
 mostrar(filtrados.slice(0,10))
 })
 
-function mostrar(lista){
+function mostrarLista(lista){
 
-let div = document.getElementById("resultado")
+let div = document.getElementById("lista")
 div.innerHTML=""
 
-lista.forEach(c=>{
+lista.forEach(p=>{
 
-let el=document.createElement("div")
+if(p.entradas>0){
 
-el.className="card"
+let el = document.createElement("div")
 
-el.innerHTML=`
-<b>${c.nome}</b><br>
-Código: ${c.codigo}<br>
-Entradas: ${c.entradas} / ${c.limite}<br>
-<button onclick="checkin('${c.codigo}')">CHECK-IN</button>
+el.innerHTML = `
+✔ ${p.nome}
 `
 
 div.appendChild(el)
+
+}
 
 })
 
