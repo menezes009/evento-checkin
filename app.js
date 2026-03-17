@@ -174,16 +174,34 @@ html5QrcodeScanner.render(onScanSuccess)
 
 
 
-let html5QrcodeScanner = new Html5QrcodeScanner(
-"reader",
+const html5QrCode = new Html5Qrcode("reader")
+
+function iniciarScanner(){
+
+Html5Qrcode.getCameras().then(devices => {
+
+let cameraId = devices[0].id
+
+html5QrCode.start(
+cameraId,
 {
 fps:10,
-qrbox:250,
-rememberLastUsedCamera:true
-}
+qrbox:250
+},
+(decodedText)=>{
+
+checkin(decodedText)
+
+},
+(errorMessage)=>{}
+
 )
 
-html5QrcodeScanner.render(onScanSuccess)
+})
+
+}
+
+iniciarScanner()
 
 
 
