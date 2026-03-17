@@ -1,0 +1,46 @@
+
+body{
+font-family: Arial, sans-serif;
+background:#f4f4f4;
+text-align:center;
+padding:20px;
+}
+
+#reader{
+width:320px;
+margin:auto;
+margin-top:20px;
+}
+
+#contador{
+font-size:40px;
+font-weight:bold;
+margin:20px;
+}
+
+.liberado{
+background:#2ecc71;
+color:white;
+padding:20px;
+font-size:28px;
+border-radius:10px;
+margin-top:20px;
+}
+
+.bloqueado{
+background:#e74c3c;
+color:white;
+padding:20px;
+font-size:28px;
+border-radius:10px;
+margin-top:20px;
+}
+
+.item{
+background:white;
+padding:10px;
+margin:5px auto;
+max-width:400px;
+border-radius:6px;
+box-shadow:0 2px 5px rgba(0,0,0,0.2);
+}
