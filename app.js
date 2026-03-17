@@ -3,16 +3,14 @@ const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledq
 let convidados = []
 let scanner
 
-
-
 async function carregar(){
 
 let res = await fetch(API)
 let data = await res.json()
 
-convidados = data.lista || data
+convidados = data.lista
 
-let checkins = convidados.filter(c => (c.entradas || 0) > 0).length
+let checkins = convidados.filter(c => c.entradas > 0).length
 
 document.getElementById("contador").innerText = checkins
 
@@ -53,7 +51,7 @@ el.className="card"
 el.innerHTML=`
 <b>${c.nome}</b><br>
 Código: ${c.codigo}<br>
-Entradas: ${c.entradas || 0} / ${c.limite}<br>
+Entradas: ${c.entradas} / ${c.limite}<br>
 <button onclick="checkin('${c.codigo}')">CHECK-IN</button>
 `
 
@@ -82,14 +80,7 @@ let msg = document.getElementById("mensagem")
 if(r=="OK"){
 
 msg.innerHTML=`
-<div style="
-background:#27ae60;
-color:white;
-font-size:30px;
-padding:20px;
-border-radius:10px;
-margin-top:20px;
-font-weight:bold;">
+<div style="background:#27ae60;color:white;font-size:30px;padding:20px;border-radius:10px;margin-top:20px;">
 ✅ Entrada liberada
 </div>
 `
@@ -99,14 +90,7 @@ font-weight:bold;">
 else if(r=="LIMITE"){
 
 msg.innerHTML=`
-<div style="
-background:#e74c3c;
-color:white;
-font-size:30px;
-padding:20px;
-border-radius:10px;
-margin-top:20px;
-font-weight:bold;">
+<div style="background:#e74c3c;color:white;font-size:30px;padding:20px;border-radius:10px;margin-top:20px;">
 🚫 Já entrou
 </div>
 `
@@ -116,14 +100,7 @@ font-weight:bold;">
 else{
 
 msg.innerHTML=`
-<div style="
-background:#c0392b;
-color:white;
-font-size:30px;
-padding:20px;
-border-radius:10px;
-margin-top:20px;
-font-weight:bold;">
+<div style="background:#c0392b;color:white;font-size:30px;padding:20px;border-radius:10px;margin-top:20px;">
 QR inválido
 </div>
 `
@@ -136,7 +113,7 @@ carregar()
 
 
 
-// SCANNER ESTÁVEL
+// SCANNER
 
 function iniciarScanner(){
 
@@ -144,26 +121,20 @@ scanner = new Html5Qrcode("reader")
 
 Html5Qrcode.getCameras().then(cameras => {
 
-if(!cameras.length){
-alert("Nenhuma câmera encontrada")
-return
-}
-
-// pega câmera traseira
 let camera = cameras.find(c => c.label.toLowerCase().includes("back")) || cameras[0]
 
 scanner.start(
 camera.id,
 {
-fps:15,
+fps:10,
 qrbox:250
 },
-(decodedText) => {
+(decodedText)=>{
 
 checkin(decodedText)
 
 },
-(error) => {}
+(err)=>{}
 
 )
 
@@ -175,5 +146,4 @@ iniciarScanner()
 
 
 
-// atualiza contador
 setInterval(carregar,5000)
