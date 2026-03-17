@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
+
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Scanner de Check-in</title>
-
-<link rel="stylesheet" href="style.css">
+<title>Check-in Evento</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
+
+<link rel="stylesheet" href="style.css">
 
 </head>
 
@@ -17,20 +17,26 @@
 
 <h1>Check-in Evento</h1>
 
-<input type="text" id="busca" placeholder="Buscar por nome ou código">
+<input id="busca" placeholder="Buscar por nome ou código">
 
 <div id="resultado"></div>
 
 <h2>Scanner QR</h2>
 
-<div id="reader" style="width:320px;margin:auto;"></div>
+<div id="reader"></div>
 
 <div id="mensagem"></div>
 
 <h2>Total de convidados no evento</h2>
+
 <div id="contador">0</div>
+
+<audio id="ok" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+
+<audio id="erro" src="https://actions.google.com/sounds/v1/cartoon/boing.ogg"></audio>
 
 <script src="app.js"></script>
 
 </body>
+
 </html>
