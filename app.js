@@ -1,98 +1,152 @@
-function doGet() {
+const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
 
-const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-const dados = sheet.getDataRange().getValues();
+let convidados = []
 
-let convidados=[]
-let totalCheckin = 0
+async function carregar(){
 
-for(let i=1;i<dados.length;i++){
+try{
 
-let nome = dados[i][1]
-let codigo = dados[i][3]
-let entradas = dados[i][9] || 0
-let limite = dados[i][10] || 1
+let res = await fetch(API + "?t=" + new Date().getTime())
 
-if(entradas>0) totalCheckin++
+let data = await res.json()
 
-if(nome && codigo){
+convidados = data.lista
 
-convidados.push({
-nome:nome,
-codigo:codigo,
-entradas:entradas,
-limite:limite
+document.getElementById("contador").innerText = convidados.length
+document.getElementById("checkins").innerText = data.contador
+
+mostrarLista(convidados)
+
+}catch(e){
+
+console.log("Erro API",e)
+
+}
+
+}
+
+
+
+function mostrarLista(lista){
+
+let div = document.getElementById("lista")
+
+if(!div) return
+
+div.innerHTML = ""
+
+lista.forEach(p=>{
+
+let el = document.createElement("div")
+
+el.className="item"
+
+el.innerHTML=`
+
+<b>${p.nome}</b><br>
+Código: ${p.codigo}<br>
+Entradas: ${p.entradas}/${p.limite}<br><br>
+
+<button onclick="checkin('${p.codigo}')">
+CHECK-IN
+</button>
+
+`
+
+div.appendChild(el)
+
 })
 
 }
 
-}
-
-return ContentService
-.createTextOutput(JSON.stringify({
-lista: convidados,
-contador: totalCheckin
-}))
-.setMimeType(ContentService.MimeType.JSON)
-
-}
 
 
-
-function doPost(e){
-
-const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet()
-
-let codigo = ""
+async function checkin(codigo){
 
 try{
 
-let dados = JSON.parse(e.postData.contents)
-codigo = dados.codigo
+let res = await fetch(API,{
 
-}catch(err){
+method:"POST",
 
-codigo = e.parameter.codigo
+headers:{
+"Content-Type":"text/plain;charset=utf-8"
+},
 
-}
+body:JSON.stringify({
+codigo:codigo
+})
 
-let lista = sheet.getDataRange().getValues()
+})
 
-for(let i=1;i<lista.length;i++){
+let r = await res.json()
 
-if(lista[i][3] == codigo){
+let msg = document.getElementById("mensagem")
 
-let nome = lista[i][1]
-let limite = lista[i][10] || 1
-let entradas = lista[i][9] || 0
+if(!msg) return
 
-if(entradas >= limite){
+if(r.status=="OK"){
 
-return ContentService.createTextOutput(JSON.stringify({
-status:"LIMITE",
-nome:nome
-}))
-.setMimeType(ContentService.MimeType.JSON)
+msg.className="liberado"
+msg.innerHTML="✅ "+r.nome+" LIBERADO"
 
-}
+}else if(r.status=="LIMITE"){
 
-sheet.getRange(i+1,10).setValue(entradas+1)
-sheet.getRange(i+1,8).setValue("CHECK-IN")
-sheet.getRange(i+1,9).setValue(new Date())
+msg.className="bloqueado"
+msg.innerHTML="❌ "+r.nome+" JÁ ENTROU"
 
-return ContentService.createTextOutput(JSON.stringify({
-status:"OK",
-nome:nome
-}))
-.setMimeType(ContentService.MimeType.JSON)
+}else{
+
+msg.className="bloqueado"
+msg.innerHTML="❌ QR INVÁLIDO"
 
 }
 
+carregar()
+
+}catch(e){
+
+console.log("Erro checkin",e)
+
 }
 
-return ContentService.createTextOutput(JSON.stringify({
-status:"INVALIDO"
-}))
-.setMimeType(ContentService.MimeType.JSON)
+}
+
+
+
+function iniciarScanner(){
+
+const html5QrCode = new Html5Qrcode("reader")
+
+html5QrCode.start(
+
+{ facingMode: { exact: "environment" } },
+
+{
+fps:10,
+qrbox:250
+},
+
+(qrCodeMessage)=>{
+
+checkin(qrCodeMessage)
+
+}
+
+).catch(err => {
+
+console.log("Erro câmera",err)
+
+})
+
+}
+
+
+
+window.onload = function(){
+
+carregar()
+
+setTimeout(iniciarScanner,500)
 
 }
