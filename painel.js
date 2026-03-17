@@ -1,4 +1,4 @@
-fetch("LINK_DO_APPS_SCRIPT")
+fetch("https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec")
 .then(res => res.json())
 .then(data => {
 
