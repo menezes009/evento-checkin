@@ -1,6 +1,9 @@
 const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec"
 
 let convidados = []
+let scanner
+
+
 
 async function carregar(){
 
@@ -18,6 +21,8 @@ document.getElementById("contador").innerText = checkins
 carregar()
 
 
+
+// BUSCA
 
 document.getElementById("busca").addEventListener("input", function(){
 
@@ -75,15 +80,54 @@ let r = await res.text()
 let msg = document.getElementById("mensagem")
 
 if(r=="OK"){
-msg.innerHTML='<div class="ok">Entrada liberada ✔</div>'
+
+msg.innerHTML=`
+<div style="
+background:#27ae60;
+color:white;
+font-size:30px;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+font-weight:bold;">
+✅ Entrada liberada
+</div>
+`
+
 }
 
 else if(r=="LIMITE"){
-msg.innerHTML='<div class="erro">Limite atingido</div>'
+
+msg.innerHTML=`
+<div style="
+background:#e74c3c;
+color:white;
+font-size:30px;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+font-weight:bold;">
+🚫 Já entrou
+</div>
+`
+
 }
 
 else{
-msg.innerHTML='<div class="erro">Código inválido</div>'
+
+msg.innerHTML=`
+<div style="
+background:#c0392b;
+color:white;
+font-size:30px;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+font-weight:bold;">
+QR inválido
+</div>
+`
+
 }
 
 carregar()
@@ -92,34 +136,44 @@ carregar()
 
 
 
-function onScanSuccess(decodedText){
+// SCANNER ESTÁVEL
+
+function iniciarScanner(){
+
+scanner = new Html5Qrcode("reader")
+
+Html5Qrcode.getCameras().then(cameras => {
+
+if(!cameras.length){
+alert("Nenhuma câmera encontrada")
+return
+}
+
+// pega câmera traseira
+let camera = cameras.find(c => c.label.toLowerCase().includes("back")) || cameras[0]
+
+scanner.start(
+camera.id,
+{
+fps:15,
+qrbox:250
+},
+(decodedText) => {
 
 checkin(decodedText)
 
-setTimeout(()=>{
-html5QrcodeScanner.clear().then(()=>{
-html5QrcodeScanner.render(onScanSuccess)
-})
-},1500)
+},
+(error) => {}
 
-}
-
-
-
-let html5QrcodeScanner = new Html5QrcodeScanner(
-"reader",
-{
-fps:10,
-qrbox:250,
-rememberLastUsedCamera:false,
-videoConstraints:{
-facingMode:"environment"
-}
-}
 )
 
-html5QrcodeScanner.render(onScanSuccess)
+})
+
+}
+
+iniciarScanner()
 
 
 
+// atualiza contador
 setInterval(carregar,5000)
