@@ -66,8 +66,6 @@ let r = await res.json()
 
 let msg = document.getElementById("mensagem")
 
-
-
 if(r.status=="OK"){
 
 msg.innerHTML = `
@@ -90,13 +88,9 @@ z-index:9999;">
 </div>
 `
 
-setTimeout(()=>{
-msg.innerHTML=""
-},2500)
+setTimeout(()=>{ msg.innerHTML="" },2500)
 
 }
-
-
 
 else if(r.status=="LIMITE"){
 
@@ -120,13 +114,9 @@ z-index:9999;">
 </div>
 `
 
-setTimeout(()=>{
-msg.innerHTML=""
-},2500)
+setTimeout(()=>{ msg.innerHTML="" },2500)
 
 }
-
-
 
 else{
 
@@ -150,9 +140,7 @@ QR INVÁLIDO
 </div>
 `
 
-setTimeout(()=>{
-msg.innerHTML=""
-},2500)
+setTimeout(()=>{ msg.innerHTML="" },2500)
 
 }
 
@@ -166,20 +154,44 @@ function iniciarScanner(){
 
 html5QrCode = new Html5Qrcode("reader")
 
+Html5Qrcode.getCameras().then(devices => {
+
+if(!devices || devices.length === 0){
+alert("Nenhuma câmera encontrada")
+return
+}
+
+// tenta encontrar câmera traseira
+let cameraId = devices[0].id
+
+devices.forEach(cam => {
+
+let label = cam.label.toLowerCase()
+
+if(
+label.includes("back") ||
+label.includes("rear") ||
+label.includes("traseira") ||
+label.includes("environment")
+){
+cameraId = cam.id
+}
+
+})
+
 html5QrCode.start(
-{ facingMode: "environment" },   // força câmera traseira
+cameraId,
 {
 fps:10,
 qrbox:250
 },
 (decodedText)=>{
-
 checkin(decodedText)
-
 },
 (errorMessage)=>{}
-
 )
+
+})
 
 }
 
@@ -196,8 +208,6 @@ iniciarScanner()
 
 
 iniciarScanner()
-
-
 
 setInterval(carregar,3000)
 carregar()
