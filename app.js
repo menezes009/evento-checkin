@@ -10,7 +10,6 @@ async function carregar(){
 try{
 
 let res = await fetch(API + "?t=" + new Date().getTime())
-
 let data = await res.json()
 
 convidados = data.lista
@@ -18,7 +17,6 @@ convidados = data.lista
 document.getElementById("contador").innerText = convidados.length
 document.getElementById("checkins").innerText = data.contador
 
-mostrarLista(convidados)
 mostrarEntradas(convidados)
 
 }catch(e){
@@ -39,6 +37,13 @@ if(!div) return
 
 div.innerHTML = ""
 
+if(lista.length == 0){
+
+div.innerHTML = "<p>Nenhum convidado encontrado</p>"
+return
+
+}
+
 lista.forEach(p=>{
 
 let el = document.createElement("div")
@@ -51,9 +56,9 @@ el.innerHTML=`
 Código: ${p.codigo}<br>
 Entradas: ${p.entradas}/${p.limite}<br><br>
 
-<button onclick="checkin('${p.codigo}')">
-CHECK-IN
-</button>
+${p.entradas >= p.limite 
+? `<div class="jaentrou">✔ Já entrou</div>` 
+: `<button onclick="checkin('${p.codigo}')">CHECK-IN</button>`}
 
 `
 
@@ -173,6 +178,30 @@ console.log("Erro câmera",err)
 })
 
 }
+
+
+
+document.getElementById("busca").addEventListener("input", function(){
+
+let termo = this.value.toLowerCase()
+
+if(termo.length < 2){
+
+document.getElementById("lista").innerHTML = ""
+return
+
+}
+
+let filtrados = convidados.filter(p =>
+
+p.nome.toLowerCase().includes(termo) ||
+p.codigo.toLowerCase().includes(termo)
+
+)
+
+mostrarLista(filtrados)
+
+})
 
 
 
