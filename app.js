@@ -41,7 +41,7 @@ div.appendChild(el)
 
 function checkin(codigo){
 
-fetch("LINK_DO_APPS_SCRIPT",{
+fetch("https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledqSNPf9oooZMOSOqb2viMRoTxlgFA_D6eBgXB-rlYN/exec",{
 method:"POST",
 body:JSON.stringify({codigo})
 })
