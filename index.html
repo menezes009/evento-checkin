@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Check-in Evento</title>
+
+<title>Scanner de Check-in</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -16,31 +17,20 @@
 
 <h1>Check-in Evento</h1>
 
-<div id="reader"></div>
+<input type="text" id="busca" placeholder="Buscar por nome ou código">
 
-<button onclick="trocarCamera()" style="
-padding:12px 20px;
-font-size:18px;
-margin-top:10px;
-background:#333;
-color:white;
-border:none;
-border-radius:8px;">
-Trocar câmera
-</button>
+<div id="resultado"></div>
+
+<h2>Scanner QR</h2>
+
+<div id="reader" style="width:320px;margin:auto;"></div>
 
 <div id="mensagem"></div>
 
 <h2>Total de convidados no evento</h2>
-
 <div id="contador">0</div>
-
-<h2>Check-ins realizados</h2>
-
-<div id="lista"></div>
 
 <script src="app.js"></script>
 
 </body>
-
 </html>
