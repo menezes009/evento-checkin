@@ -68,7 +68,7 @@ let res = await fetch(API,{
 method:"POST",
 
 headers:{
-"Content-Type":"application/json"
+"Content-Type":"text/plain;charset=utf-8"
 },
 
 body:JSON.stringify({
@@ -86,19 +86,16 @@ if(!msg) return
 if(r.status=="OK"){
 
 msg.className="liberado"
-
 msg.innerHTML="✅ "+r.nome+" LIBERADO"
 
 }else if(r.status=="LIMITE"){
 
 msg.className="bloqueado"
-
 msg.innerHTML="❌ "+r.nome+" JÁ ENTROU"
 
 }else{
 
 msg.className="bloqueado"
-
 msg.innerHTML="❌ QR INVÁLIDO"
 
 }
