@@ -62,6 +62,8 @@ div.appendChild(el)
 
 
 
+// CHECKIN
+
 async function checkin(codigo){
 
 let res = await fetch(API,{
@@ -76,20 +78,34 @@ let r = await res.json()
 
 let msg = document.getElementById("mensagem")
 
-if(r.status=="OK"){
+if(r.status == "OK"){
 
 msg.innerHTML=`
-<div style="background:#27ae60;color:white;font-size:32px;padding:25px;border-radius:12px;margin-top:20px;">
+<div style="
+background:#27ae60;
+color:white;
+font-size:34px;
+padding:25px;
+border-radius:12px;
+margin-top:20px;
+font-weight:bold;">
 ✅ ${r.nome} LIBERADO
 </div>
 `
 
 }
 
-else if(r.status=="LIMITE"){
+else if(r.status == "LIMITE"){
 
 msg.innerHTML=`
-<div style="background:#e74c3c;color:white;font-size:32px;padding:25px;border-radius:12px;margin-top:20px;">
+<div style="
+background:#e74c3c;
+color:white;
+font-size:34px;
+padding:25px;
+border-radius:12px;
+margin-top:20px;
+font-weight:bold;">
 🚫 ${r.nome} JÁ ENTROU
 </div>
 `
@@ -99,7 +115,14 @@ msg.innerHTML=`
 else{
 
 msg.innerHTML=`
-<div style="background:#c0392b;color:white;font-size:32px;padding:25px;border-radius:12px;margin-top:20px;">
+<div style="
+background:#c0392b;
+color:white;
+font-size:34px;
+padding:25px;
+border-radius:12px;
+margin-top:20px;
+font-weight:bold;">
 QR INVÁLIDO
 </div>
 `
@@ -118,8 +141,14 @@ function iniciarScanner(){
 
 const html5QrCode = new Html5Qrcode("reader")
 
-Html5QrCode.getCameras().then(cameras => {
+Html5Qrcode.getCameras().then(cameras => {
 
+if(!cameras.length){
+alert("Nenhuma câmera encontrada")
+return
+}
+
+// força câmera traseira
 let traseira = cameras.find(c =>
 c.label.toLowerCase().includes("back") ||
 c.label.toLowerCase().includes("traseira")
@@ -150,6 +179,6 @@ iniciarScanner()
 
 
 
-// atualiza contador automaticamente
+// ATUALIZA CONTADOR AUTOMATICAMENTE
 
 setInterval(carregar,5000)
