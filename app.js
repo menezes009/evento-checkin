@@ -161,7 +161,15 @@ carregar()
 
 
 function onScanSuccess(decodedText){
+
 checkin(decodedText)
+
+setTimeout(()=>{
+html5QrcodeScanner.clear().then(() => {
+html5QrcodeScanner.render(onScanSuccess)
+})
+},2000)
+
 }
 
 
