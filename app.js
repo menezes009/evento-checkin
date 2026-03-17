@@ -2,6 +2,9 @@ const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledq
 
 let convidados = []
 
+const somOk = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg")
+const somErro = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg")
+
 async function carregar(){
 
 try{
@@ -16,6 +19,7 @@ document.getElementById("contador").innerText = convidados.length
 document.getElementById("checkins").innerText = data.contador
 
 mostrarLista(convidados)
+mostrarEntradas(convidados)
 
 }catch(e){
 
@@ -61,11 +65,37 @@ div.appendChild(el)
 
 
 
+function mostrarEntradas(lista){
+
+let div = document.getElementById("entradas")
+
+if(!div) return
+
+div.innerHTML = ""
+
+lista
+.filter(p => p.entradas > 0)
+.reverse()
+.forEach(p=>{
+
+let el = document.createElement("div")
+
+el.className="entrada"
+
+el.innerHTML = "✔ " + p.nome
+
+div.appendChild(el)
+
+})
+
+}
+
+
+
 async function checkin(codigo){
 
 try{
 
-// envia o código pela URL (compatível com Apps Script)
 let res = await fetch(API + "?codigo=" + encodeURIComponent(codigo) + "&t=" + Date.now(),{
 
 method:"POST"
@@ -80,6 +110,8 @@ if(!msg) return
 
 if(r.status=="OK"){
 
+somOk.play()
+
 msg.className="liberado"
 msg.innerHTML="✅ " + r.nome + " LIBERADO"
 
@@ -87,12 +119,16 @@ msg.innerHTML="✅ " + r.nome + " LIBERADO"
 
 else if(r.status=="LIMITE"){
 
+somErro.play()
+
 msg.className="bloqueado"
 msg.innerHTML="❌ " + r.nome + " JÁ ENTROU"
 
 }
 
 else{
+
+somErro.play()
 
 msg.className="bloqueado"
 msg.innerHTML="❌ QR INVÁLIDO"
@@ -145,5 +181,7 @@ window.onload = function(){
 carregar()
 
 setTimeout(iniciarScanner,500)
+
+setInterval(carregar,5000)
 
 }
