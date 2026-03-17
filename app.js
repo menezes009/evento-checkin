@@ -9,8 +9,6 @@ let data = await res.json()
 
 convidados = data.lista || data
 
-// contador real
-let total = convidados.length
 let checkins = convidados.filter(c => (c.entradas || 0) > 0).length
 
 document.getElementById("contador").innerText = checkins
@@ -20,8 +18,6 @@ document.getElementById("contador").innerText = checkins
 carregar()
 
 
-
-// BUSCA MANUAL
 
 document.getElementById("busca").addEventListener("input", function(){
 
@@ -79,54 +75,15 @@ let r = await res.text()
 let msg = document.getElementById("mensagem")
 
 if(r=="OK"){
-
-msg.innerHTML=`
-<div style="
-background:#27ae60;
-color:white;
-font-size:30px;
-padding:20px;
-border-radius:10px;
-margin-top:20px;
-font-weight:bold;">
-✅ Entrada liberada
-</div>
-`
-
+msg.innerHTML='<div class="ok">Entrada liberada ✔</div>'
 }
 
 else if(r=="LIMITE"){
-
-msg.innerHTML=`
-<div style="
-background:#e74c3c;
-color:white;
-font-size:30px;
-padding:20px;
-border-radius:10px;
-margin-top:20px;
-font-weight:bold;">
-🚫 Já entrou
-</div>
-`
-
+msg.innerHTML='<div class="erro">Limite atingido</div>'
 }
 
 else{
-
-msg.innerHTML=`
-<div style="
-background:#c0392b;
-color:white;
-font-size:30px;
-padding:20px;
-border-radius:10px;
-margin-top:20px;
-font-weight:bold;">
-QR inválido
-</div>
-`
-
+msg.innerHTML='<div class="erro">Código inválido</div>'
 }
 
 carregar()
@@ -134,8 +91,6 @@ carregar()
 }
 
 
-
-// SCANNER QR
 
 function onScanSuccess(decodedText){
 
@@ -163,10 +118,8 @@ facingMode:"environment"
 }
 )
 
-
-
 html5QrcodeScanner.render(onScanSuccess)
 
 
-// atualiza contador automaticamente
+
 setInterval(carregar,5000)
