@@ -3,11 +3,25 @@ const API = "https://script.google.com/macros/s/AKfycbwhdLjEQouDWwfLYCbEPW-cledq
 let convidados = []
 
 async function carregar(){
+
 let res = await fetch(API)
-convidados = await res.json()
+let data = await res.json()
+
+convidados = data.lista || data
+
+// contador real
+let total = convidados.length
+let checkins = convidados.filter(c => (c.entradas || 0) > 0).length
+
+document.getElementById("contador").innerText = checkins
+
 }
 
 carregar()
+
+
+
+// BUSCA MANUAL
 
 document.getElementById("busca").addEventListener("input", function(){
 
@@ -21,6 +35,8 @@ let filtrados = convidados.filter(c =>
 mostrar(filtrados.slice(0,10))
 
 })
+
+
 
 function mostrar(lista){
 
@@ -36,7 +52,7 @@ el.className="card"
 el.innerHTML=`
 <b>${c.nome}</b><br>
 Código: ${c.codigo}<br>
-Entradas: ${c.entradas} / ${c.limite}<br>
+Entradas: ${c.entradas || 0} / ${c.limite}<br>
 <button onclick="checkin('${c.codigo}')">CHECK-IN</button>
 `
 
@@ -45,6 +61,8 @@ div.appendChild(el)
 })
 
 }
+
+
 
 async function checkin(codigo){
 
@@ -61,20 +79,63 @@ let r = await res.text()
 let msg = document.getElementById("mensagem")
 
 if(r=="OK"){
-msg.innerHTML='<div class="ok">Entrada liberada ✔</div>'
+
+msg.innerHTML=`
+<div style="
+background:#27ae60;
+color:white;
+font-size:30px;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+font-weight:bold;">
+✅ Entrada liberada
+</div>
+`
+
 }
 
 else if(r=="LIMITE"){
-msg.innerHTML='<div class="erro">Limite atingido</div>'
+
+msg.innerHTML=`
+<div style="
+background:#e74c3c;
+color:white;
+font-size:30px;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+font-weight:bold;">
+🚫 Já entrou
+</div>
+`
+
 }
 
 else{
-msg.innerHTML='<div class="erro">Código inválido</div>'
+
+msg.innerHTML=`
+<div style="
+background:#c0392b;
+color:white;
+font-size:30px;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+font-weight:bold;">
+QR inválido
+</div>
+`
+
 }
 
 carregar()
 
 }
+
+
+
+// SCANNER QR
 
 function onScanSuccess(decodedText){
 
@@ -88,13 +149,13 @@ html5QrcodeScanner.render(onScanSuccess)
 
 }
 
+
+
 let html5QrcodeScanner = new Html5QrcodeScanner(
 "reader",
 {
-fps:15,
-qrbox:350,
-aspectRatio:1,
-disableFlip:false,
+fps:10,
+qrbox:250,
 rememberLastUsedCamera:false,
 videoConstraints:{
 facingMode:"environment"
@@ -102,4 +163,10 @@ facingMode:"environment"
 }
 )
 
+
+
 html5QrcodeScanner.render(onScanSuccess)
+
+
+// atualiza contador automaticamente
+setInterval(carregar,5000)
