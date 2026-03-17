@@ -10,6 +10,7 @@ convidados = await res.json()
 carregar()
 
 document.getElementById("busca").addEventListener("input", function(){
+
 let termo = this.value.toLowerCase()
 
 let filtrados = convidados.filter(c =>
@@ -18,6 +19,7 @@ let filtrados = convidados.filter(c =>
 )
 
 mostrar(filtrados.slice(0,10))
+
 })
 
 function mostrar(lista){
@@ -59,54 +61,15 @@ let r = await res.text()
 let msg = document.getElementById("mensagem")
 
 if(r=="OK"){
-
-msg.innerHTML=`
-<div style="
-background:#27ae60;
-color:white;
-font-size:35px;
-padding:25px;
-border-radius:10px;
-margin-top:20px;
-font-weight:bold;">
-✅ Entrada liberada
-</div>
-`
-
+msg.innerHTML='<div class="ok">Entrada liberada ✔</div>'
 }
 
 else if(r=="LIMITE"){
-
-msg.innerHTML=`
-<div style="
-background:#e74c3c;
-color:white;
-font-size:35px;
-padding:25px;
-border-radius:10px;
-margin-top:20px;
-font-weight:bold;">
-🚫 Já entrou
-</div>
-`
-
+msg.innerHTML='<div class="erro">Limite atingido</div>'
 }
 
 else{
-
-msg.innerHTML=`
-<div style="
-background:#c0392b;
-color:white;
-font-size:35px;
-padding:25px;
-border-radius:10px;
-margin-top:20px;
-font-weight:bold;">
-QR inválido
-</div>
-`
-
+msg.innerHTML='<div class="erro">Código inválido</div>'
 }
 
 carregar()
@@ -128,9 +91,10 @@ html5QrcodeScanner.render(onScanSuccess)
 let html5QrcodeScanner = new Html5QrcodeScanner(
 "reader",
 {
-fps:10,
-qrbox:{width:300,height:300},
+fps:15,
+qrbox:350,
 aspectRatio:1,
+disableFlip:false,
 rememberLastUsedCamera:false,
 videoConstraints:{
 facingMode:"environment"
